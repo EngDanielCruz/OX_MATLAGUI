@@ -36,11 +36,12 @@ void Accumulator_Init_values(uint8_t dataselect ){
       }
     ACC=sum/FILTERTAPS;
     Filt_data[((FILTERTAPS-1)>>1)]=ACC;
-        }else{
+        }
+    if(dataselect==RED_acc){
     // find y((FILTERTAPS-1)/2) by averaging  sample [0 , FILTERTAPS-1]
-            for (i=0; i<FILTERTAPS; i++){
-              sum = sum + RED_FIFO_DATA[i];
-            }
+      for (i=0; i<FILTERTAPS; i++){
+        sum = sum + RED_FIFO_DATA[i];
+      }
     ACC=sum/FILTERTAPS;
     Filt_data[((FILTERTAPS-1)>>1)]=ACC;
     }
