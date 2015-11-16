@@ -1,0 +1,409 @@
+******************************************************************************
+                  TI ARM Linker PC v5.2.2                      
+******************************************************************************
+>> Linked Tue Oct 27 22:33:35 2015
+
+OUTPUT FILE NAME:   <NRFnetwork_OXIMETER.out>
+ENTRY POINT SYMBOL: "_c_int00"  address: 00002b6d
+
+
+MEMORY CONFIGURATION
+
+         name            origin    length      used     unused   attr    fill
+----------------------  --------  ---------  --------  --------  ----  --------
+  FLASH                 00000000   00040000  00002f04  0003d0fc  R  X
+  SRAM                  20000000   00008000  0000079d  00007863  RW X
+
+
+SEGMENT ALLOCATION MAP
+
+run origin  load origin   length   init length attrs members
+----------  ----------- ---------- ----------- ----- -------
+00000000    00000000    00002f08   00002f08    r-x
+  00000000    00000000    0000026c   0000026c    r-- .intvecs
+  00000270    00000270    00002a42   00002a42    r-x .text
+  00002cb2    00002cb2    000001ee   000001ee    r-- .const
+  00002ea0    00002ea0    00000068   00000068    r-- .cinit
+20000000    20000000    000007a0   00000000    rw-
+  20000000    20000000    00000521   00000000    rw- .bss
+  20000524    20000524    00000200   00000000    rw- .stack
+  20000724    20000724    00000074   00000000    rw- .data
+  20000798    20000798    00000008   00000000    rw- .sysmem
+
+
+SECTION ALLOCATION MAP
+
+ output                                  attributes/
+section   page    origin      length       input sections
+--------  ----  ----------  ----------   ----------------
+.intvecs   0    00000000    0000026c     
+                  00000000    0000026c     startup_ccs.obj (.intvecs)
+
+.text      0    00000270    00002a42     
+                  00000270    00000b04     NRF24.obj (.text)
+                  00000d74    00000004     rtsv7M4_T_le_v4SPD16_eabi.lib : pre_init.obj (.text)
+                  00000d78    0000072a     Oled.obj (.text)
+                  000014a2    00000006     rtsv7M4_T_le_v4SPD16_eabi.lib : copy_decompress_rle.obj (.text:decompress:rle24)
+                  000014a8    000006a4     Periferal_Init.obj (.text)
+                  00001b4c    00000004     --HOLE-- [fill = 0]
+                  00001b50    0000046e     main.obj (.text)
+                  00001fbe    00000002     --HOLE-- [fill = 0]
+                  00001fc0    00000444     system_LM4F.obj (.text)
+                  00002404    00000004     --HOLE-- [fill = 0]
+                  00002408    00000220     MAX30100.obj (.text)
+                  00002628    000001e4     I2C.obj (.text)
+                  0000280c    00000004     --HOLE-- [fill = 0]
+                  00002810    0000016e     SPI.obj (.text)
+                  0000297e    0000009c     rtsv7M4_T_le_v4SPD16_eabi.lib : memcpy_t2.obj (.text)
+                  00002a1a    0000007a                                   : memset_t2.obj (.text)
+                  00002a94    0000006c                                   : autoinit.obj (.text)
+                  00002b00    0000006a                                   : copy_decompress_rle.obj (.text)
+                  00002b6a    00000002     --HOLE-- [fill = 0]
+                  00002b6c    00000050                                   : boot.obj (.text)
+                  00002bbc    0000004c                                   : cpy_tbl.obj (.text)
+                  00002c08    00000044                                   : exit.obj (.text)
+                  00002c4c    00000004     --HOLE-- [fill = 0]
+                  00002c50    0000001a     startup_ccs.obj (.text)
+                  00002c6a    00000002     --HOLE-- [fill = 0]
+                  00002c6c    00000018     rtsv7M4_T_le_v4SPD16_eabi.lib : args_main.obj (.text)
+                  00002c84    00000014                                   : _lock.obj (.text)
+                  00002c98    0000000e                                   : copy_decompress_none.obj (.text:decompress:none)
+                  00002ca6    0000000c                                   : copy_zero_init.obj (.text:decompress:ZI)
+
+.const     0    00002cb2    000001ee     
+                  00002cb2    000001e0     Oled.obj (.const:ASCII)
+                  00002e92    0000000a     main.obj (.const:.string)
+                  00002e9c    00000004     NRF24.obj (.const)
+
+.cinit     0    00002ea0    00000068     
+                  00002ea0    00000042     (.cinit..data.load) [load image, compression = rle]
+                  00002ee2    00000002     --HOLE-- [fill = 0]
+                  00002ee4    0000000c     (__TI_handler_table)
+                  00002ef0    00000008     (.cinit..bss.load) [load image, compression = zero_init]
+                  00002ef8    00000010     (__TI_cinit_table)
+
+.init_array 
+*          0    00000000    00000000     UNINITIALIZED
+
+.bss       0    20000000    00000521     UNINITIALIZED
+                  20000000    00000280     MAX30100.obj (.bss:IR_FIFO_DATA)
+                  20000280    00000280     MAX30100.obj (.bss:RED_FIFO_DATA)
+                  20000500    00000014     (.common:RegisteredDevices)
+                  20000514    00000004     (.common:ADCvalue)
+                  20000518    00000004     (.common:StatusReg)
+                  2000051c    00000004     (.common:duty_cycle)
+                  20000520    00000001     (.common:DeviceCnt)
+
+.TI.noinit 
+*          0    20000000    00000000     UNINITIALIZED
+
+.stack     0    20000524    00000200     UNINITIALIZED
+                  20000524    00000200     --HOLE--
+
+.data      0    20000724    00000074     UNINITIALIZED
+                  20000724    00000037     NRF24.obj (.data)
+                  2000075b    00000001     --HOLE--
+                  2000075c    0000001c     main.obj (.data)
+                  20000778    00000008     rtsv7M4_T_le_v4SPD16_eabi.lib : _lock.obj (.data)
+                  20000780    00000008                                   : exit.obj (.data)
+                  20000788    00000006     MAX30100.obj (.data)
+                  2000078e    00000002     --HOLE--
+                  20000790    00000004     rtsv7M4_T_le_v4SPD16_eabi.lib : stkdepth_vars.obj (.data)
+                  20000794    00000004     system_LM4F.obj (.data)
+
+.TI.persistent 
+*          0    20000724    00000000     UNINITIALIZED
+
+.sysmem    0    20000798    00000008     UNINITIALIZED
+                  20000798    00000008     rtsv7M4_T_le_v4SPD16_eabi.lib : memory.obj (.sysmem)
+
+
+LINKER GENERATED COPY TABLES
+
+__TI_cinit_table @ 00002ef8 records: 2, size/record: 8, table size: 16
+	.data: load addr=00002ea0, load size=00000042 bytes, run addr=20000724, run size=00000074 bytes, compression=rle
+	.bss: load addr=00002ef0, load size=00000008 bytes, run addr=20000000, run size=00000521 bytes, compression=zero_init
+
+
+LINKER GENERATED HANDLER TABLE
+
+__TI_handler_table @ 00002ee4 records: 3, size/record: 4, table size: 12
+	index: 0, handler: __TI_decompress_rle24
+	index: 1, handler: __TI_decompress_none
+	index: 2, handler: __TI_zero_init
+
+
+GLOBAL SYMBOLS: SORTED ALPHABETICALLY BY Name 
+
+address   name                    
+-------   ----                    
+00001bc1  ADCSeq2_HANDLER         
+00001731  ADC_initTimer3          
+20000768  ADCflag                 
+20000514  ADCvalue                
+00002c09  C$$EXIT                 
+00001d41  CheckInterrupts         
+00001ec1  Check_MAX_Interrupts    
+00000321  ConfigNRF24_Reg         
+20000724  DATA_PIPE0_ADDRESS      
+20000729  DATA_PIPE1_ADDRESS      
+2000072e  DATA_PIPE2_ADDRESS      
+20000733  DATA_PIPE3_ADDRESS      
+20000738  DATA_PIPE4_ADDRESS      
+2000073d  DATA_PIPE5_ADDRESS      
+20000742  DATA_PIPEx_ADDRESS      
+20000520  DeviceCnt               
+00001ba1  GPIO_PortB_Handler      
+00001b81  GPIO_PortC_Handler      
+00001a61  GPIO_init               
+00002629  I2C_Init                
+00002761  I2C_ReadByte            
+00002801  I2C_Stop                
+000026a1  I2C_writeByte           
+20000764  IRQflags_MAX            
+20000760  IRQflags_NRF            
+20000000  IR_FIFO_DATA            
+20000788  IRsample_cnt            
+000014f9  Interrupt_IRQ           
+00002409  Max30100_Init           
+2000078c  NofSamples              
+00001161  Oled_Clear_Display      
+00001479  Oled_DisplayWhen_Init   
+00001259  Oled_Draw_Hline         
+000011c1  Oled_Draw_Pixel         
+00001319  Oled_Draw_Vline         
+00000f11  Oled_Init               
+00001151  Oled_TrunOff            
+00001101  Oled_Write_Char         
+00000ed1  Oled_Write_Cmd          
+00000ef1  Oled_Write_Data         
+00001071  Oled_Write_String       
+00001f09  Oled_int2string         
+00001709  PWM_Duty                
+00001609  PWM_Init                
+00000731  Ping_TX                 
+00000739  Process_Data            
+20000280  RED_FIFO_DATA           
+2000078a  REDsample_cnt           
+20000747  RX_PAYLOAD              
+00002519  Read_MAX_DATAFIFO       
+000002c9  Read_Reg                
+00000601  Read_data               
+20000500  RegisteredDevices       
+00002c51  ResetISR                
+UNDEFED   SHT$$INIT_ARRAY$$Base   
+UNDEFED   SHT$$INIT_ARRAY$$Limit  
+00002811  SPI_Init                
+00000d79  SPI_Oled_Init           
+00000e71  SPI_Oled_transfer       
+00002919  SPI_transfer            
+000009c9  Send_COM_PIPE           
+00000ce9  Send_Error_Code         
+000025f9  StartSampling           
+20000518  StatusReg               
+00002611  StopSampling            
+20000794  SystemCoreClock         
+000021a9  SystemCoreClockUpdate   
+000022e9  SystemInit              
+2000075c  T0flags                 
+00001bf9  TIMER0A_HANDLER         
+00001c19  TIMER2A_HANDLER         
+20000751  TX_PAYLOAD              
+00001961  TimerEdgeCounter_init   
+000018e1  Timer_Init              
+00000271  Write_Reg               
+00000659  Write_data              
+00000a89  Write_data_To_data_pipeX
+20000724  __STACK_END             
+00000200  __STACK_SIZE            
+20000724  __STACK_TOP             
+00000008  __SYSMEM_SIZE           
+00002ef8  __TI_CINIT_Base         
+00002f08  __TI_CINIT_Limit        
+00002ee4  __TI_Handler_Table_Base 
+00002ef0  __TI_Handler_Table_Limit
+00002a95  __TI_auto_init          
+20000780  __TI_cleanup_ptr        
+00002c99  __TI_decompress_none    
+000014a3  __TI_decompress_rle24   
+20000784  __TI_dtors_ptr          
+00000000  __TI_static_base__      
+00002ca7  __TI_zero_init          
+00002a1b  __aeabi_memclr          
+00002a1b  __aeabi_memclr4         
+00002a1b  __aeabi_memclr8         
+0000297f  __aeabi_memcpy          
+0000297f  __aeabi_memcpy4         
+0000297f  __aeabi_memcpy8         
+00002a1d  __aeabi_memset          
+00002a1d  __aeabi_memset4         
+00002a1d  __aeabi_memset8         
+ffffffff  __binit__               
+ffffffff  __c_args__              
+20000524  __stack                 
+00002c6d  _args_main              
+00002b6d  _c_int00                
+20000778  _lock                   
+00002c93  _nop                    
+00002c8b  _register_lock          
+00002c85  _register_unlock        
+20000798  _sys_memory             
+00000d75  _system_pre_init        
+2000077c  _unlock                 
+00002c0d  abort                   
+ffffffff  binit                   
+00002bbd  copy_in                 
+2000051c  duty_cycle              
+00002c15  exit                    
+000005d1  flush_RX                
+000005a1  flush_TX                
+00000000  g_pfnVectors            
+00000a51  get_pipe_from_STATUS    
+00001c31  main                    
+20000790  main_func_sp            
+0000297f  memcpy                  
+00002a23  memset                  
+00002e9c  node                    
+20000774  rps                     
+000027e1  setSlaveAddress         
+20000770  val                     
+2000076c  voltage                 
+
+
+GLOBAL SYMBOLS: SORTED BY Symbol Address 
+
+address   name                    
+-------   ----                    
+00000000  __TI_static_base__      
+00000000  g_pfnVectors            
+00000008  __SYSMEM_SIZE           
+00000200  __STACK_SIZE            
+00000271  Write_Reg               
+000002c9  Read_Reg                
+00000321  ConfigNRF24_Reg         
+000005a1  flush_TX                
+000005d1  flush_RX                
+00000601  Read_data               
+00000659  Write_data              
+00000731  Ping_TX                 
+00000739  Process_Data            
+000009c9  Send_COM_PIPE           
+00000a51  get_pipe_from_STATUS    
+00000a89  Write_data_To_data_pipeX
+00000ce9  Send_Error_Code         
+00000d75  _system_pre_init        
+00000d79  SPI_Oled_Init           
+00000e71  SPI_Oled_transfer       
+00000ed1  Oled_Write_Cmd          
+00000ef1  Oled_Write_Data         
+00000f11  Oled_Init               
+00001071  Oled_Write_String       
+00001101  Oled_Write_Char         
+00001151  Oled_TrunOff            
+00001161  Oled_Clear_Display      
+000011c1  Oled_Draw_Pixel         
+00001259  Oled_Draw_Hline         
+00001319  Oled_Draw_Vline         
+00001479  Oled_DisplayWhen_Init   
+000014a3  __TI_decompress_rle24   
+000014f9  Interrupt_IRQ           
+00001609  PWM_Init                
+00001709  PWM_Duty                
+00001731  ADC_initTimer3          
+000018e1  Timer_Init              
+00001961  TimerEdgeCounter_init   
+00001a61  GPIO_init               
+00001b81  GPIO_PortC_Handler      
+00001ba1  GPIO_PortB_Handler      
+00001bc1  ADCSeq2_HANDLER         
+00001bf9  TIMER0A_HANDLER         
+00001c19  TIMER2A_HANDLER         
+00001c31  main                    
+00001d41  CheckInterrupts         
+00001ec1  Check_MAX_Interrupts    
+00001f09  Oled_int2string         
+000021a9  SystemCoreClockUpdate   
+000022e9  SystemInit              
+00002409  Max30100_Init           
+00002519  Read_MAX_DATAFIFO       
+000025f9  StartSampling           
+00002611  StopSampling            
+00002629  I2C_Init                
+000026a1  I2C_writeByte           
+00002761  I2C_ReadByte            
+000027e1  setSlaveAddress         
+00002801  I2C_Stop                
+00002811  SPI_Init                
+00002919  SPI_transfer            
+0000297f  __aeabi_memcpy          
+0000297f  __aeabi_memcpy4         
+0000297f  __aeabi_memcpy8         
+0000297f  memcpy                  
+00002a1b  __aeabi_memclr          
+00002a1b  __aeabi_memclr4         
+00002a1b  __aeabi_memclr8         
+00002a1d  __aeabi_memset          
+00002a1d  __aeabi_memset4         
+00002a1d  __aeabi_memset8         
+00002a23  memset                  
+00002a95  __TI_auto_init          
+00002b6d  _c_int00                
+00002bbd  copy_in                 
+00002c09  C$$EXIT                 
+00002c0d  abort                   
+00002c15  exit                    
+00002c51  ResetISR                
+00002c6d  _args_main              
+00002c85  _register_unlock        
+00002c8b  _register_lock          
+00002c93  _nop                    
+00002c99  __TI_decompress_none    
+00002ca7  __TI_zero_init          
+00002e9c  node                    
+00002ee4  __TI_Handler_Table_Base 
+00002ef0  __TI_Handler_Table_Limit
+00002ef8  __TI_CINIT_Base         
+00002f08  __TI_CINIT_Limit        
+20000000  IR_FIFO_DATA            
+20000280  RED_FIFO_DATA           
+20000500  RegisteredDevices       
+20000514  ADCvalue                
+20000518  StatusReg               
+2000051c  duty_cycle              
+20000520  DeviceCnt               
+20000524  __stack                 
+20000724  DATA_PIPE0_ADDRESS      
+20000724  __STACK_END             
+20000724  __STACK_TOP             
+20000729  DATA_PIPE1_ADDRESS      
+2000072e  DATA_PIPE2_ADDRESS      
+20000733  DATA_PIPE3_ADDRESS      
+20000738  DATA_PIPE4_ADDRESS      
+2000073d  DATA_PIPE5_ADDRESS      
+20000742  DATA_PIPEx_ADDRESS      
+20000747  RX_PAYLOAD              
+20000751  TX_PAYLOAD              
+2000075c  T0flags                 
+20000760  IRQflags_NRF            
+20000764  IRQflags_MAX            
+20000768  ADCflag                 
+2000076c  voltage                 
+20000770  val                     
+20000774  rps                     
+20000778  _lock                   
+2000077c  _unlock                 
+20000780  __TI_cleanup_ptr        
+20000784  __TI_dtors_ptr          
+20000788  IRsample_cnt            
+2000078a  REDsample_cnt           
+2000078c  NofSamples              
+20000790  main_func_sp            
+20000794  SystemCoreClock         
+20000798  _sys_memory             
+ffffffff  __binit__               
+ffffffff  __c_args__              
+ffffffff  binit                   
+UNDEFED   SHT$$INIT_ARRAY$$Base   
+UNDEFED   SHT$$INIT_ARRAY$$Limit  
+
+[131 symbols]

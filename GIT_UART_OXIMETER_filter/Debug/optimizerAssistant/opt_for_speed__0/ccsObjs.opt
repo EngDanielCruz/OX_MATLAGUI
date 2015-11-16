@@ -1,0 +1,1 @@
+"./NRF24.obj" "./Periferal_Init.obj" "./SPI.obj" "./main.obj" "./startup_ccs.obj" "./src/system_LM4F.obj" "../lm4f120h5qr.cmd" -l"libc.a" 
