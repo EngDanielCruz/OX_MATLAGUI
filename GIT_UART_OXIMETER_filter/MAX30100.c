@@ -75,7 +75,7 @@ void Read_MAX_DATAFIFO(){
 
     uint8_t highByte = 0;
     uint8_t lowByte = 0;
-    uint16_t i;
+    //uint16_t i;
 
    // I2C_writeByte(FIFO_WRITE_PTR, I2C_WRITE, (I2C_MCS_START | I2C_MCS_RUN));
    // uint32_t FifoWritePTR = I2C_ReadByte(((I2C_MCS_START | I2C_MCS_RUN | I2C_MCS_STOP & ~I2C_MCS_ACK)));
