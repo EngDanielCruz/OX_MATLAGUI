@@ -151,6 +151,10 @@ int main(void){
 
             case 'S':
             {
+                print_uint( (NofSamples-1), 4);   // print the number of samples
+                printChar('\r');
+                printChar('\n');
+                // start sampling
                    I2C_writeByte(INTERRUPT_STATUS, I2C_WRITE, (I2C_MCS_START | I2C_MCS_RUN));
                    uint32_t MAX_StatusReg = I2C_ReadByte(((I2C_MCS_START | I2C_MCS_RUN | I2C_MCS_STOP)));
                    StartSampling();
@@ -159,9 +163,6 @@ int main(void){
             case 'R':  // send raw data
             {
             // send IR_FIFO_DATA to UART
-                print_uint( (NofSamples-1), 4);   // print the number of samples
-                printChar('\r');
-                printChar('\n');
                 for(i=0; i<(NofSamples-1); i++){
                     print_uint( IR_FIFO_DATA[i], 5);
                     printChar('\r');
