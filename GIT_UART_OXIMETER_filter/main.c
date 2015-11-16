@@ -184,7 +184,7 @@ int main(void){
                 NewValue=0;
                 Accumulator_Init_values(RED_acc);
                 for(i=initPos; i<finalPos; i++){
-                    Filt_data[i]= EMA_Process(IR_FIFO_DATA[i]);
+                    Filt_data[i]= EMA_Process(RED_FIFO_DATA[i]);
                 }
             // send RED Filt_data to UART
                 for(i=0; i<(NofSamples-1); i++){
