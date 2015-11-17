@@ -223,34 +223,10 @@ int main(void){
             {
                 uint8_t len;
                 uint8_t j=0;
-                uint8_t commapos[3];
-                char nofsamp[4];
-                int nofsampp;
-                char  alphaa[3];
-                int  alphaaa;
-                char tapss[3];
-                int tapsss;
+                readStr();
                 len=strlen(str);
 
-                for(i=0;i<len;i++){
-                    if (str[i]==','){
-                        commapos[j]=i;
-                        j++;
-                    }
-                }
-                for(i=0;i<commapos[0];i++){
-                    nofsamp[i]=str[i];
-                }
-                for(i=(commapos[0]+1);i<commapos[1];i++){
-                    alphaa[i]=str[i];
-                }
-                for(i=(commapos[1]+1);i<commapos[2];i++){
-                    tapss[i]=str[i];
-                }
-                nofsampp=atoi(nofsamp);
-                alphaaa=atoi(alphaa);
-                tapsss=atoi(tapss);
-                break;
+
             }
             default:
             {

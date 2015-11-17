@@ -153,11 +153,15 @@ for (i=0;i<10;i++){
     str[i] =0;
 }
         while (i<10){
-            if (str[i] == '\n' || str[i] == '\r'){
-                break;
+            // wait for the new character
+            while((UART0->FR & (1<<4)) == 0){
+                // if is the end of the string
+                if (str[i] == '\n' || str[i] == '\r'){
+                    break;
+                }
+                str[i]= readChar();
+                i++;
             }
-            str[i]= readChar();
-            i++;
         }
 }
 
