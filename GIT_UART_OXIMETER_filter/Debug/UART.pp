@@ -16,6 +16,7 @@ UART.obj: C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/include/stdlib.h
 UART.obj: C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/include/string.h
 UART.obj: C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/include/assert.h
 UART.obj: ../UART.h
+UART.obj: ../MAX30100.h
 
 ../UART.c: 
 C:/Users/Dany/Documents/ti/cmsisproj/inc/LM4F120E5QR.h: 
@@ -33,3 +34,4 @@ C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/include/stdlib.h:
 C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/include/string.h: 
 C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/include/assert.h: 
 ../UART.h: 
+../MAX30100.h: 

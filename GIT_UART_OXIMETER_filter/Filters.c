@@ -12,10 +12,11 @@
 //*****************************************************************************
 //                          Global Variables
 //*****************************************************************************
-float Filt_data[4000-((FILTERTAPS-1)>>1)];
+extern struct confcom configValues;
+float Filt_data[MAXSAMPLES];
 float  ACC=0;
-float alpha =0.4;
 float NewValue=0;
+
 //*************************************************************************
 //                          FUNCTIONS
 //*************************************************************************
@@ -31,24 +32,24 @@ void Accumulator_Init_values(uint8_t dataselect ){
     ACC=0;
     if(dataselect==IR_acc){
     // find y((FILTERTAPS-1)/2) by averaging  sample [0 , FILTERTAPS-1]
-      for (i=0; i<FILTERTAPS; i++){
+      for (i=0; i<configValues.taps; i++){
         sum = sum + IR_FIFO_DATA[i];
       }
-    ACC=sum/FILTERTAPS;
-    Filt_data[((FILTERTAPS-1)>>1)]=ACC;
+    ACC=sum/configValues.taps;
+    Filt_data[((configValues.taps-1)>>1)]=ACC;
         }
     if(dataselect==RED_acc){
     // find y((FILTERTAPS-1)/2) by averaging  sample [0 , FILTERTAPS-1]
-      for (i=0; i<FILTERTAPS; i++){
+      for (i=0; i<configValues.taps; i++){
         sum = sum + RED_FIFO_DATA[i];
       }
-    ACC=sum/FILTERTAPS;
-    Filt_data[((FILTERTAPS-1)>>1)]=ACC;
+    ACC=sum/configValues.taps;
+    Filt_data[((configValues.taps-1)>>1)]=ACC;
     }
 }
 
 float EMA_Process(uint16_t Value){
-     NewValue = ACC + (alpha*(Value-ACC));
+     NewValue = ACC + (configValues.alpha*(Value-ACC));
      ACC=NewValue;
      return NewValue;
 }

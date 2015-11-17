@@ -12,12 +12,13 @@
 #include <string.h>
 #include <assert.h>
 #include "UART.h"
+#include "MAX30100.h"
 
 //*****************************************************************************
 //                          Global Variables
 //*****************************************************************************
 char str[13];
-
+extern struct confcom configValues;
 
 //*************************************************************************
 //                          FUNCTIONS
@@ -172,19 +173,16 @@ void process_command(void){
     uint8_t j=0;
     uint8_t auxcnt[3];
     char auxarray[4];
-    uint16_t nofsamp;
-    float alph;
-    uint8_t tap;
-
     for(i=0; i<12; i++){
         if (str[i] == ','){
             auxcnt[j]=i;
             j++;
         }
     }
-    nofsamp = atoi(strncpy ( auxarray, str, auxcnt[0] ));
-    alph=atof(strncpy ( auxarray, (str+auxcnt[0]+1), auxcnt[1] ));
-    tap = atoi(strncpy ( auxarray, (str+auxcnt[1]+1), auxcnt[2] ));
+
+    /* configValues.NofSamples= atoi(strncpy ( auxarray, str, auxcnt[0] ));
+   configValues.alpha=atof(strncpy ( auxarray, (str+(auxcnt[0]+1)), auxcnt[1] ));*/
+    configValues.taps = atoi(strncpy ( auxarray, (str+auxcnt[1]+1), auxcnt[2] ));
 
 }
 

@@ -15,13 +15,14 @@
 //*****************************************************************************
 //                          Global Variables
 //*****************************************************************************
-//const NofSamples=4000;
-uint16_t IR_FIFO_DATA[NofSamples];
-uint16_t RED_FIFO_DATA[NofSamples];
+//uint16_t NofSamples=4000;
+uint16_t IR_FIFO_DATA[MAXSAMPLES];
+uint16_t RED_FIFO_DATA[MAXSAMPLES];
 
 uint16_t IRsample_cnt=0;
 uint16_t REDsample_cnt=0;
-
+// initialize the default config values
+struct confcom configValues ={MAXSAMPLES,0.4,11};
 
 //*****************************************************************************
 
@@ -30,10 +31,10 @@ void Max30100_Init(){
 
     uint16_t i = 0;
 
-    for (i=0; i<NofSamples; i++){
+    for (i=0; i<configValues.NofSamples; i++){
         IR_FIFO_DATA[i]=0;
     }
-    for (i=0; i<NofSamples; i++){
+    for (i=0; i<configValues.NofSamples; i++){
         RED_FIFO_DATA[i]=0;
     }
 
@@ -111,7 +112,7 @@ void Read_MAX_DATAFIFO(){
        REDsample_cnt++;
     }
 */
-    if (IRsample_cnt == NofSamples-1){
+    if (IRsample_cnt == configValues.NofSamples-1){
         StopSampling();
         IRsample_cnt=0;
         REDsample_cnt=0;

@@ -72,6 +72,8 @@ float rps = 0;
 uint32_t duty_cycle;
 // uint8_t StatusReg[2];
 
+extern struct confcom configValues;
+
 //*****************************************************************************
 //                          interrupt handlers
 //*****************************************************************************
@@ -154,7 +156,7 @@ int main(void){
 
             case 'S':
             {
-                print_uint( (NofSamples-1), 4);   // print the number of samples
+                print_uint( (configValues.NofSamples-1), 4);   // print the number of samples
                 printChar('\r');
                 printChar('\n');
                 // start sampling
@@ -166,13 +168,13 @@ int main(void){
             case 'R':  // send raw data
             {
             // send IR_FIFO_DATA to UART
-                for(i=0; i<(NofSamples-1); i++){
+                for(i=0; i<(configValues.NofSamples-1); i++){
                     print_uint( IR_FIFO_DATA[i], 5);
                     printChar('\r');
                     printChar('\n');
                 }
             // send IR_FIFO_DATA to UART
-                for(i=0; i<(NofSamples-1); i++){
+                for(i=0; i<(configValues.NofSamples-1); i++){
                     print_uint( RED_FIFO_DATA[i], 5);
                     printChar('\r');
                     printChar('\n');
@@ -181,9 +183,9 @@ int main(void){
             }
             case 'F':
             {
-            // filter red data
-                initPos=((FILTERTAPS-1)>>1)+1;       // start at 6 position for n of taps=11
-                finalPos=(4000-((FILTERTAPS-1)>>1));
+            // filter RED data
+                initPos=((configValues.taps-1)>>1)+1;       // start at 6 position for n of taps=11
+                finalPos=(4000-((configValues.taps-1)>>1));
                 ACC=0;
                 NewValue=0;
                 Accumulator_Init_values(RED_acc);
@@ -191,7 +193,7 @@ int main(void){
                     Filt_data[i]= EMA_Process(RED_FIFO_DATA[i]);
                 }
             // send RED Filt_data to UART
-                for(i=0; i<(NofSamples-1); i++){
+                for(i=0; i<(configValues.NofSamples-1); i++){
                     printDouble( Filt_data[i]);    // send float
                     printChar('\r');
                     printChar('\n');
@@ -200,9 +202,9 @@ int main(void){
             }
             case 'f':    //the filter routine take 29946 clock cycles=0.007487s
             {
-            // filter ir data
-                initPos=((FILTERTAPS-1)>>1)+1;       // start at 6 position for n of taps=11
-                finalPos=(4000-((FILTERTAPS-1)>>1));
+            // filter IR data
+                initPos=((configValues.taps-1)>>1)+1;       // start at 6 position for n of taps=11
+                finalPos=(4000-((configValues.taps-1)>>1));
                 ACC=0;
                 NewValue=0;
                 Accumulator_Init_values(IR_acc);
@@ -210,7 +212,7 @@ int main(void){
                     Filt_data[i]= EMA_Process(IR_FIFO_DATA[i]);
                 }
            // send IR Filt_data to UART
-                for(i=0; i<(NofSamples-1); i++){
+                for(i=0; i<(configValues.NofSamples-1); i++){
                     printDouble( Filt_data[i]);    // send float
                     printChar('\r');
                     printChar('\n');

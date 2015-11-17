@@ -13,7 +13,7 @@
 //*****************************************************************************
 //                          #defines
 //*****************************************************************************
-#define  NofSamples 400
+#define  MAXSAMPLES 4000
 #define  IR_acc 0
 #define  RED_acc 1
 
@@ -58,11 +58,18 @@ struct STATUS_REG  {
     uint8_t PWR_RDY:  1;
 };
 
+struct confcom { // struct type to represent config commands receive in serial port
+    uint16_t NofSamples;
+    float alpha;
+    uint8_t taps;
+};
+
 //extern uint8_t MAX_FIFO_DATA[64] ;
 //extern const uint16_t NofSamples;
 extern uint16_t sample_cnt;
 extern uint16_t IR_FIFO_DATA[];
 extern uint16_t RED_FIFO_DATA[];
+extern uint16_t NofSamples;
 
 //*************************************************************************
 //                          FUNCTIONS PROTOTYPES
