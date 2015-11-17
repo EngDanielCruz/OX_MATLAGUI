@@ -218,6 +218,7 @@ int main(void){
 
             break;
             }
+
             case 'C':  // config routine
             {
                 uint8_t len;
