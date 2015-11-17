@@ -172,7 +172,7 @@ void process_command(void){
     uint8_t i=0;
     uint8_t j=0;
     uint8_t auxcnt[3];
-    char auxarray[4];
+    char auxarray[6];
     for(i=0; i<12; i++){
         if (str[i] == ','){
             auxcnt[j]=i;
@@ -180,9 +180,9 @@ void process_command(void){
         }
     }
 
-     configValues.NofSamples= atoi(strncpy ( auxarray, str, auxcnt[0] ));
-   configValues.alpha=atof(memcpy ( auxarray, &auxcnt[auxcnt[0]+1], auxcnt[1] ));
-    /*configValues.taps = atoi(strncpy ( auxarray, (str+auxcnt[1]+1), auxcnt[2] ));*/
+   configValues.NofSamples= atoi(strncpy ( auxarray, str, auxcnt[0] ));
+   configValues.alpha=atof(memcpy ( auxarray, &str[auxcnt[0]+1], auxcnt[1] ));
+   configValues.taps = atoi(strncpy ( auxarray, (str+auxcnt[1]+1), auxcnt[2] ));
 
 }
 

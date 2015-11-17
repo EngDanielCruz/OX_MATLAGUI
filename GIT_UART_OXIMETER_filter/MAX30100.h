@@ -61,7 +61,7 @@ struct STATUS_REG  {
 struct confcom { // struct type to represent config commands receive in serial port
     uint16_t NofSamples;
     float alpha;
-    uint8_t taps;
+    uint16_t taps;
 };
 
 //extern uint8_t MAX_FIFO_DATA[64] ;
