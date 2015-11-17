@@ -180,9 +180,9 @@ void process_command(void){
         }
     }
 
-    /* configValues.NofSamples= atoi(strncpy ( auxarray, str, auxcnt[0] ));
-   configValues.alpha=atof(strncpy ( auxarray, (str+(auxcnt[0]+1)), auxcnt[1] ));*/
-    configValues.taps = atoi(strncpy ( auxarray, (str+auxcnt[1]+1), auxcnt[2] ));
+     configValues.NofSamples= atoi(strncpy ( auxarray, str, auxcnt[0] ));
+   configValues.alpha=atof(memcpy ( auxarray, &auxcnt[auxcnt[0]+1], auxcnt[1] ));
+    /*configValues.taps = atoi(strncpy ( auxarray, (str+auxcnt[1]+1), auxcnt[2] ));*/
 
 }
 
