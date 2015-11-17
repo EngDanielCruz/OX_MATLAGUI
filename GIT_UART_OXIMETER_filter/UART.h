@@ -17,7 +17,7 @@
 //*****************************************************************************
 //                            Variables
 //*****************************************************************************
-
+extern char str[10];
 
 //*************************************************************************
 //                          FUNCTIONS PROTOTYPES
@@ -25,7 +25,9 @@
 
 void UART_Init(void);
 char readChar(void);
+void readStr(void);
 void printChar(char);
 void print_String( const char *str);
 void print_uint( unsigned long u, uint8_t digits);
 void printDouble( double val);
+

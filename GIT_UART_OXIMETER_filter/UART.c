@@ -7,12 +7,16 @@
 
 
 #include <LM4F120E5QR.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <assert.h>
 #include "UART.h"
 
 //*****************************************************************************
 //                          Global Variables
 //*****************************************************************************
-
+char str[10];
 
 
 //*************************************************************************
@@ -140,6 +144,21 @@ void printDouble( double val){
 
        frac = (val - (int)val) * 1000;
        print_uint(frac,3);
+}
+
+void readStr(){
+   uint8_t i=0; // control counter to prevent infinite loop in case of receive failure
+
+for (i=0;i<10;i++){
+    str[i] =0;
+}
+        while (i<10){
+            if (str[i] == '\n' || str[i] == '\r'){
+                break;
+            }
+            str[i]= readChar();
+            i++;
+        }
 }
 
 
