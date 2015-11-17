@@ -16,7 +16,7 @@
 //*****************************************************************************
 //                          Global Variables
 //*****************************************************************************
-char str[10];
+char str[13];
 
 
 //*************************************************************************
@@ -149,10 +149,11 @@ void printDouble( double val){
 void readStr(){
    uint8_t i=0; // control counter to prevent infinite loop in case of receive failure
 
-for (i=0;i<10;i++){
+for (i=0;i<13;i++){
     str[i] =0;
 }
-        while (i<10){
+       i=0;
+        while (i<13){
             // wait for the new character
             while((UART0->FR & (1<<4)) == 0){
                 // if is the end of the string
@@ -162,7 +163,39 @@ for (i=0;i<10;i++){
                 str[i]= readChar();
                 i++;
             }
+
         }
 }
+
+void process_command(void){
+    uint8_t i=0;
+    uint8_t j=0;
+    uint8_t auxcnt[3];
+    char auxarray[4];
+    uint16_t nofsamp;
+    float alph;
+    uint8_t tap;
+
+    for(i=0; i<12; i++){
+        if (str[i] == ','){
+            auxcnt[j]=i;
+            j++;
+        }
+    }
+    nofsamp = atoi(strncpy ( auxarray, str, auxcnt[0] ));
+    alph=atof(strncpy ( auxarray, (str+auxcnt[0]+1), auxcnt[1] ));
+    tap = atoi(strncpy ( auxarray, (str+auxcnt[1]+1), auxcnt[2] ));
+
+}
+
+
+
+
+
+
+
+
+
+
 
 

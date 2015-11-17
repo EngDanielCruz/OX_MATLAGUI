@@ -221,10 +221,9 @@ int main(void){
 
             case 'C':  // config routine
             {
-                uint8_t len;
-                uint8_t j=0;
+
                 readStr();
-                len=strlen(str);
+                process_command();
 
 
             }

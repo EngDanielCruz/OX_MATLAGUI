@@ -17,7 +17,7 @@
 //*****************************************************************************
 //                            Variables
 //*****************************************************************************
-extern char str[10];
+extern char str[13];
 
 //*************************************************************************
 //                          FUNCTIONS PROTOTYPES
@@ -30,4 +30,4 @@ void printChar(char);
 void print_String( const char *str);
 void print_uint( unsigned long u, uint8_t digits);
 void printDouble( double val);
-
+void process_command(void);
