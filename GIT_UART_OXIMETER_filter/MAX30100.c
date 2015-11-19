@@ -23,6 +23,7 @@ uint16_t IRsample_cnt=0;
 uint16_t REDsample_cnt=0;
 // initialize the default config values
 struct confcom configValues ={MAXSAMPLES,0.4,11};
+struct configregister configresvalue   ={0x3,0xE,0x50,0xCC};
 
 //*****************************************************************************
 
@@ -65,7 +66,7 @@ void Max30100_Init(){
    // I2C_writeByte(0x04, I2C_WRITE, (I2C_MCS_RUN | I2C_MCS_STOP));                         // 13 bit resolution, 200us PW and 1000 sps
 
     I2C_writeByte(LED_CONFIG, I2C_WRITE, (I2C_MCS_START | I2C_MCS_RUN));
-    I2C_writeByte(0xCC, I2C_WRITE, (I2C_MCS_RUN | I2C_MCS_STOP));                         // 20.8 mA
+    I2C_writeByte(0xCC, I2C_WRITE, (I2C_MCS_RUN | I2C_MCS_STOP));                         // 40.2 mA
     // end burst------------------------------------------------------
 
 }

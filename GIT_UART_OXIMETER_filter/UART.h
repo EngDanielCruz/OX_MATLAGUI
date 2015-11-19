@@ -25,9 +25,10 @@ extern char str[13];
 
 void UART_Init(void);
 char readChar(void);
-void readStr(void);
+void readStr(uint8_t len);
 void printChar(char);
 void print_String( const char *str);
 void print_uint( unsigned long u, uint8_t digits);
 void printDouble( double val);
 void process_command(void);
+void process_REGISTER_command(void);

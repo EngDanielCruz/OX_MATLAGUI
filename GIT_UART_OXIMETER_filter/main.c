@@ -224,11 +224,20 @@ int main(void){
             case 'C':  // config routine
             {
 
-                readStr();
+                readStr(13);
                 process_command();
 
-
+            break;
             }
+            case 'L':  // config routine
+            {
+
+                readStr(14);
+                process_REGISTER_command();
+
+            break;
+            }
+
             default:
             {
             break;

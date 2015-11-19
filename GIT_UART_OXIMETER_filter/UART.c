@@ -19,7 +19,7 @@
 //*****************************************************************************
 char str[13];
 extern struct confcom configValues;
-
+extern struct configregister configresvalue ;
 //*************************************************************************
 //                          FUNCTIONS
 //*************************************************************************
@@ -147,14 +147,14 @@ void printDouble( double val){
        print_uint(frac,3);
 }
 
-void readStr(){
+void readStr(uint8_t len){
    uint8_t i=0; // control counter to prevent infinite loop in case of receive failure
 
-for (i=0;i<13;i++){
+for (i=0;i<len;i++){
     str[i] =0;
 }
        i=0;
-        while (i<13){
+        while (i<len){
             // wait for the new character
             while((UART0->FR & (1<<4)) == 0){
                 // if is the end of the string
@@ -186,7 +186,23 @@ void process_command(void){
 
 }
 
+void process_REGISTER_command(){
+    uint8_t i=0;
+    uint8_t j=0;
+    uint8_t auxcnt[4];
+    char auxarray[15];
+    for(i=0; i<15; i++){
+        if (str[i] == ','){
+            auxcnt[j]=i;
+            j++;
+        }
+    }
 
+    configresvalue.modeconfig = atoi(strncpy ( auxarray, str, auxcnt[0] ));
+    configresvalue.spo2config=atoi(strncpy ( auxarray, &str[auxcnt[0]+1], auxcnt[1] ));
+    configresvalue.intconfig = atoi(strncpy ( auxarray, (str+auxcnt[1]+1), auxcnt[2] ));
+    configresvalue.ledconfig=atoi(strncpy ( auxarray, (str+auxcnt[2]+1), auxcnt[3] ));
+}
 
 
 

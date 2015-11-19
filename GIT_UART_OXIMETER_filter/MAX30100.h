@@ -63,6 +63,13 @@ struct confcom { // struct type to represent config commands receive in serial p
     float alpha;
     uint16_t taps;
 };
+struct configregister { // struct type to represent REGISTERconfig commands receive in serial port
+    uint16_t modeconfig;
+    uint16_t spo2config;
+    uint16_t intconfig;
+    uint16_t ledconfig;
+
+};
 
 //extern uint8_t MAX_FIFO_DATA[64] ;
 //extern const uint16_t NofSamples;
