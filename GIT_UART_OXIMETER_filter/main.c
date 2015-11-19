@@ -221,17 +221,18 @@ int main(void){
             break;
             }
 
-            case 'C':  // config routine
+            case 'C':  // config sampling and filter routine
             {
                 readStr(14);
                 process_command();
 
             break;
             }
-            case 'L':  // config routine
+            case 'L':  // config registers routine
             {
                 readStr(15);
                 process_REGISTER_command();
+                Max30100_Init();
 
             break;
             }
@@ -353,7 +354,7 @@ void Check_MAX_Interrupts(){
         }else if(((MAX_StatusReg) &    (1<<(4)))){               // SPO2_RDY
             //StopSampling();
             Read_MAX_DATAFIFO();
-            StopSampling();
+            //StopSampling();
               }else if(((MAX_StatusReg) &    (1<<(5)))){          // HR_RDY
 
                    }else if(((MAX_StatusReg) &    (1<<(6)))){     //TEMP_RDY

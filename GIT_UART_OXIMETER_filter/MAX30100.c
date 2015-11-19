@@ -40,8 +40,8 @@ void Max30100_Init(){
     }
 
 
-    I2C_writeByte(INTERRUPT_ENABLE, I2C_WRITE, (I2C_MCS_START | I2C_MCS_RUN));
-    I2C_writeByte(0x81, I2C_WRITE, ( I2C_MCS_RUN | I2C_MCS_STOP));                        // enable A_FULL interrrupt
+    I2C_writeByte(INTERRUPT_ENABLE, I2C_WRITE, (I2C_MCS_START | I2C_MCS_RUN));            //0x81
+    I2C_writeByte(configresvalue.intconfig, I2C_WRITE, ( I2C_MCS_RUN | I2C_MCS_STOP));                        // enable A_FULL interrrupt
 
     I2C_writeByte(FIFO_WRITE_PTR, I2C_WRITE, ( I2C_MCS_START | I2C_MCS_RUN));
     I2C_writeByte(0x00, I2C_WRITE, ( I2C_MCS_RUN | I2C_MCS_STOP));                         // clear FIFO_WRITE_PTR
@@ -54,19 +54,19 @@ void Max30100_Init(){
     // end burst----------------------------------------------------
 
     //I2C_writeByte(MODE_CONFIG, I2C_WRITE, (I2C_MCS_START | I2C_MCS_RUN));
-   // I2C_writeByte(0x3, I2C_WRITE, (I2C_MCS_RUN));                         // enable mode 011 -> SPO2 enable
+   // I2C_writeByte(configresvalue.modeconfig, I2C_WRITE, (I2C_MCS_RUN));                         // enable mode 011 -> SPO2 enable
 
     //I2C_writeByte(SPO2_CONFIG, I2C_WRITE, (I2C_MCS_START | I2C_MCS_RUN));
    // I2C_writeByte(0x43, I2C_WRITE, (I2C_MCS_RUN | I2C_MCS_STOP));                         // 16 bit resolution,  PW and 100 sps
 
     I2C_writeByte(SPO2_CONFIG, I2C_WRITE, (I2C_MCS_START | I2C_MCS_RUN));
-    I2C_writeByte(0xE, I2C_WRITE, (I2C_MCS_RUN | I2C_MCS_STOP));                         // 15 bit resolution, 800us PW
+    I2C_writeByte(configresvalue.spo2config, I2C_WRITE, (I2C_MCS_RUN | I2C_MCS_STOP));                         // 15 bit resolution, 800us PW
 
    // I2C_writeByte(SPO2_CONFIG, I2C_WRITE, (I2C_MCS_START | I2C_MCS_RUN));
    // I2C_writeByte(0x04, I2C_WRITE, (I2C_MCS_RUN | I2C_MCS_STOP));                         // 13 bit resolution, 200us PW and 1000 sps
 
     I2C_writeByte(LED_CONFIG, I2C_WRITE, (I2C_MCS_START | I2C_MCS_RUN));
-    I2C_writeByte(0xCC, I2C_WRITE, (I2C_MCS_RUN | I2C_MCS_STOP));                         // 40.2 mA
+    I2C_writeByte( configresvalue.ledconfig, I2C_WRITE, (I2C_MCS_RUN | I2C_MCS_STOP));                         // 40.2 mA
     // end burst------------------------------------------------------
 
 }
@@ -77,16 +77,35 @@ void Read_MAX_DATAFIFO(){
 
     uint8_t highByte = 0;
     uint8_t lowByte = 0;
-    //uint16_t i;
+   // uint16_t i;
+   // int8_t FifoWritePTR;
+   // uint8_t FifoReadPTR;
 
-   // I2C_writeByte(FIFO_WRITE_PTR, I2C_WRITE, (I2C_MCS_START | I2C_MCS_RUN));
-   // uint32_t FifoWritePTR = I2C_ReadByte(((I2C_MCS_START | I2C_MCS_RUN | I2C_MCS_STOP & ~I2C_MCS_ACK)));
+//    I2C_writeByte(FIFO_WRITE_PTR, I2C_WRITE, (I2C_MCS_START | I2C_MCS_RUN));
+//    FifoWritePTR = I2C_ReadByte(((I2C_MCS_START | I2C_MCS_RUN | I2C_MCS_STOP & ~I2C_MCS_ACK)));
 
-   // I2C_writeByte(FIFO_READ_PTR, I2C_WRITE, (I2C_MCS_START | I2C_MCS_RUN));
-   // uint32_t FifoReadPTR = I2C_ReadByte(((I2C_MCS_START | I2C_MCS_RUN | I2C_MCS_STOP & ~I2C_MCS_ACK)));
+//    I2C_writeByte(FIFO_READ_PTR, I2C_WRITE, (I2C_MCS_START | I2C_MCS_RUN));
+//    FifoReadPTR = I2C_ReadByte(((I2C_MCS_START | I2C_MCS_RUN | I2C_MCS_STOP & ~I2C_MCS_ACK)));
 
-   // num_available_samples = FifoWritePTR - FifoReadPTR;
 
+//    num_available_samples = abs(16 + (FifoWritePTR+1) - FifoReadPTR) % 16;
+/*
+if(num_available_samples >= 1){
+
+    for (i=0; i< num_available_samples; i++){
+       I2C_writeByte(FIFO_DATA_REG, I2C_WRITE, (I2C_MCS_START | I2C_MCS_RUN));
+       highByte = I2C_ReadByte( I2C_MCS_START|I2C_MCS_RUN | I2C_MCS_ACK);
+       lowByte  = I2C_ReadByte( I2C_MCS_RUN | I2C_MCS_ACK);
+       IR_FIFO_DATA[IRsample_cnt] =  ((highByte << 8) | lowByte)>>1;
+       IRsample_cnt++;
+
+       highByte = I2C_ReadByte( I2C_MCS_RUN | I2C_MCS_ACK);
+       lowByte = I2C_ReadByte( I2C_MCS_RUN | I2C_MCS_ACK);
+       RED_FIFO_DATA[REDsample_cnt] = ((highByte << 8) | lowByte)>>1;
+       REDsample_cnt++;
+    }
+}
+*/
     I2C_writeByte(FIFO_DATA_REG, I2C_WRITE, (I2C_MCS_START | I2C_MCS_RUN));
     highByte = I2C_ReadByte( I2C_MCS_START|I2C_MCS_RUN | I2C_MCS_ACK);
     lowByte  = I2C_ReadByte( I2C_MCS_RUN | I2C_MCS_ACK);
@@ -98,21 +117,7 @@ void Read_MAX_DATAFIFO(){
     RED_FIFO_DATA[REDsample_cnt] = (highByte << 8) | lowByte;
     REDsample_cnt++;
 
-/*
-    I2C_writeByte(FIFO_DATA_REG, I2C_WRITE, (I2C_MCS_START | I2C_MCS_RUN));
-    for (i=0; i< 15; i++){
 
-       highByte = I2C_ReadByte( I2C_MCS_START|I2C_MCS_RUN | I2C_MCS_ACK);
-       lowByte  = I2C_ReadByte( I2C_MCS_RUN | I2C_MCS_ACK);
-       IR_FIFO_DATA[IRsample_cnt] =  ((highByte << 8) | lowByte)>>1;
-       IRsample_cnt++;
-
-       highByte = I2C_ReadByte( I2C_MCS_RUN | I2C_MCS_ACK);
-       lowByte = I2C_ReadByte( I2C_MCS_RUN | I2C_MCS_ACK);
-       RED_FIFO_DATA[REDsample_cnt] = ((highByte << 8) | lowByte)>>1;
-       REDsample_cnt++;
-    }
-*/
     if (IRsample_cnt == configValues.NofSamples-1){
         StopSampling();
         IRsample_cnt=0;
@@ -157,7 +162,7 @@ void StartSampling(){
     I2C_writeByte(0x91, I2C_WRITE, ( I2C_MCS_RUN | I2C_MCS_STOP ));                        // enable A_FULL interrrupt
 */
     I2C_writeByte(MODE_CONFIG, I2C_WRITE, (I2C_MCS_START | I2C_MCS_RUN));
-    I2C_writeByte(0x3, I2C_WRITE, (I2C_MCS_RUN | I2C_MCS_STOP ));                         // enable mode 011 -> SPO2 enable
+    I2C_writeByte(configresvalue.modeconfig, I2C_WRITE, (I2C_MCS_RUN | I2C_MCS_STOP ));                         // enable mode 011 -> SPO2 enable
 
 
 
