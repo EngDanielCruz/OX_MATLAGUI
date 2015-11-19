@@ -23,7 +23,7 @@ uint16_t IRsample_cnt=0;
 uint16_t REDsample_cnt=0;
 // initialize the default config values
 struct confcom configValues ={MAXSAMPLES,0.4,11};
-struct configregister configresvalue   ={0x3,0xE,0x50,0xCC};
+struct configregister configresvalue   ={3,14,16,204};
 
 //*****************************************************************************
 

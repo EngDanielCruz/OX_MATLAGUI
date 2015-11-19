@@ -17,7 +17,7 @@
 //*****************************************************************************
 //                          Global Variables
 //*****************************************************************************
-char str[15];
+char str[16];
 extern struct confcom configValues;
 extern struct configregister configresvalue ;
 //*************************************************************************
@@ -149,20 +149,21 @@ void printDouble( double val){
 
 void readStr(uint8_t len){
    uint8_t i=0; // control counter to prevent infinite loop in case of receive failure
-
+   uint8_t endloop=0;
 for (i=0;i<len;i++){
     str[i] =0;
 }
        i=0;
-        while (i<len){
+        while ((i<len)&&(endloop==0)){
             // wait for the new character
             while((UART0->FR & (1<<4)) == 0){
                 // if is the end of the string
-                if (str[i] == '\n' || str[i] == '\r'){
+                str[i]= readChar();
+                if (str[i] == 10){
+                    endloop=1;
                     break;
                 }
-                str[i]= readChar();
-                i++;
+               i++;
             }
 
         }
@@ -171,8 +172,8 @@ for (i=0;i<len;i++){
 void process_command(void){
     uint8_t i=0;
     uint8_t j=0;
-    uint8_t auxcnt[3];
-    char auxarray[6];
+    uint8_t auxcnt[3]={0,0,0};
+    char auxarray[6]={0,0,0,0,0,0};
     for(i=0; i<12; i++){
         if (str[i] == ','){
             auxcnt[j]=i;
@@ -189,8 +190,8 @@ void process_command(void){
 void process_REGISTER_command(){
     uint8_t i=0;
     uint8_t j=0;
-    uint8_t auxcnt[4];
-    char auxarray[15];
+    uint8_t auxcnt[4]={0,0,0};
+    char auxarray[5]={0,0,0,0,0};
     for(i=0; i<16; i++){
         if (str[i] == ','){
             auxcnt[j]=i;
@@ -198,7 +199,7 @@ void process_REGISTER_command(){
         }
     }
 
-    configresvalue.modeconfig = atoi(strncpy ( auxarray, str, auxcnt[0]-1 ));
+    configresvalue.modeconfig = atoi(strncpy ( auxarray, str, auxcnt[0] ));
     configresvalue.spo2config=atoi(strncpy ( auxarray, (str+auxcnt[0]+1), auxcnt[1] ));
     configresvalue.intconfig = atoi(strncpy ( auxarray, (str+auxcnt[1]+1), auxcnt[2] ));
     configresvalue.ledconfig=atoi(strncpy ( auxarray, (str+auxcnt[2]+1), auxcnt[3] ));

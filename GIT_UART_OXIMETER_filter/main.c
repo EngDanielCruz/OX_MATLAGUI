@@ -223,16 +223,14 @@ int main(void){
 
             case 'C':  // config routine
             {
-                uint8_t len=13;
-                readStr(len);
+                readStr(14);
                 process_command();
 
             break;
             }
             case 'L':  // config routine
             {
-                uint8_t len=12;
-                readStr(len);
+                readStr(15);
                 process_REGISTER_command();
 
             break;
