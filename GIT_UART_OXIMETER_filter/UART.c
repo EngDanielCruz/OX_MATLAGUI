@@ -17,7 +17,7 @@
 //*****************************************************************************
 //                          Global Variables
 //*****************************************************************************
-char str[13];
+char str[15];
 extern struct confcom configValues;
 extern struct configregister configresvalue ;
 //*************************************************************************
@@ -191,17 +191,19 @@ void process_REGISTER_command(){
     uint8_t j=0;
     uint8_t auxcnt[4];
     char auxarray[15];
-    for(i=0; i<15; i++){
+    for(i=0; i<16; i++){
         if (str[i] == ','){
             auxcnt[j]=i;
             j++;
         }
     }
 
-    configresvalue.modeconfig = atoi(strncpy ( auxarray, str, auxcnt[0] ));
-    configresvalue.spo2config=atoi(strncpy ( auxarray, &str[auxcnt[0]+1], auxcnt[1] ));
+    configresvalue.modeconfig = atoi(strncpy ( auxarray, str, auxcnt[0]-1 ));
+    configresvalue.spo2config=atoi(strncpy ( auxarray, (str+auxcnt[0]+1), auxcnt[1] ));
     configresvalue.intconfig = atoi(strncpy ( auxarray, (str+auxcnt[1]+1), auxcnt[2] ));
     configresvalue.ledconfig=atoi(strncpy ( auxarray, (str+auxcnt[2]+1), auxcnt[3] ));
+
+
 }
 
 
