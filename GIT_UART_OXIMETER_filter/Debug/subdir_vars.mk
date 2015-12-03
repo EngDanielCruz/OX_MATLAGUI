@@ -11,7 +11,6 @@ C_SRCS += \
 ../I2C.c \
 ../MAX30100.c \
 ../NRF24.c \
-../Oled.c \
 ../Periferal_Init.c \
 ../SPI.c \
 ../UART.c \
@@ -24,7 +23,6 @@ OBJS += \
 ./I2C.obj \
 ./MAX30100.obj \
 ./NRF24.obj \
-./Oled.obj \
 ./Periferal_Init.obj \
 ./SPI.obj \
 ./UART.obj \
@@ -37,7 +35,6 @@ C_DEPS += \
 ./I2C.pp \
 ./MAX30100.pp \
 ./NRF24.pp \
-./Oled.pp \
 ./Periferal_Init.pp \
 ./SPI.pp \
 ./UART.pp \
@@ -50,7 +47,6 @@ C_DEPS__QUOTED += \
 "I2C.pp" \
 "MAX30100.pp" \
 "NRF24.pp" \
-"Oled.pp" \
 "Periferal_Init.pp" \
 "SPI.pp" \
 "UART.pp" \
@@ -63,7 +59,6 @@ OBJS__QUOTED += \
 "I2C.obj" \
 "MAX30100.obj" \
 "NRF24.obj" \
-"Oled.obj" \
 "Periferal_Init.obj" \
 "SPI.obj" \
 "UART.obj" \
@@ -76,7 +71,6 @@ C_SRCS__QUOTED += \
 "../I2C.c" \
 "../MAX30100.c" \
 "../NRF24.c" \
-"../Oled.c" \
 "../Periferal_Init.c" \
 "../SPI.c" \
 "../UART.c" \

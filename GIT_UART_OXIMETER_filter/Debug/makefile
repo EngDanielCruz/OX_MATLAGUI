@@ -11,7 +11,6 @@ ORDERED_OBJS += \
 "./I2C.obj" \
 "./MAX30100.obj" \
 "./NRF24.obj" \
-"./Oled.obj" \
 "./Periferal_Init.obj" \
 "./SPI.obj" \
 "./UART.obj" \
@@ -159,8 +158,8 @@ GIT_UART_OXIMETER_filter.hex: $(EXE_OUTPUTS)
 # Other Targets
 clean:
 	-$(RM) $(EXE_OUTPUTS__QUOTED)$(BIN_OUTPUTS__QUOTED)
-	-$(RM) "Filters.pp" "I2C.pp" "MAX30100.pp" "NRF24.pp" "Oled.pp" "Periferal_Init.pp" "SPI.pp" "UART.pp" "auxFile.pp" "main.pp" "startup_ccs.pp" "src\system_LM4F.pp" 
-	-$(RM) "Filters.obj" "I2C.obj" "MAX30100.obj" "NRF24.obj" "Oled.obj" "Periferal_Init.obj" "SPI.obj" "UART.obj" "auxFile.obj" "main.obj" "startup_ccs.obj" "src\system_LM4F.obj" 
+	-$(RM) "Filters.pp" "I2C.pp" "MAX30100.pp" "NRF24.pp" "Periferal_Init.pp" "SPI.pp" "UART.pp" "auxFile.pp" "main.pp" "startup_ccs.pp" "src\system_LM4F.pp" 
+	-$(RM) "Filters.obj" "I2C.obj" "MAX30100.obj" "NRF24.obj" "Periferal_Init.obj" "SPI.obj" "UART.obj" "auxFile.obj" "main.obj" "startup_ccs.obj" "src\system_LM4F.obj" 
 	-@echo 'Finished clean'
 	-@echo ' '
 

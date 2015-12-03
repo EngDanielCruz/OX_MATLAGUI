@@ -33,11 +33,11 @@
 #include "Periferal_Init.h"
 #include "NRF24.h"
 #include "SPI.h"
-#include "Oled.h"
 #include "I2C.h"
 #include "MAX30100.h"
 #include "Filters.h"
 #include "UART.h"
+//#include <math.h>
 
 //*****************************************************************************
 //                          #defines
@@ -236,6 +236,16 @@ int main(void){
 
             break;
             }
+            case 'D':  // config registers routine
+            {
+                float a=0;
+                float b=0;
+                float r=0;
+                linear_Regression(IR_FIFO_DATA,configValues.NofSamples,&a,&b,&r);
+                Detrend(IR_FIFO_DATA,configValues.NofSamples,&a,&b);
+
+            break;
+            }
 
             default:
             {
@@ -366,25 +376,3 @@ void Check_MAX_Interrupts(){
 
 
 
-
-
-
-
-
-
-
-
-void Oled_int2string(uint8_t x, uint8_t y, uint16_t intnumber){
-
-   char  ascii[10]={'0','1','2','3','4','5','6','7','8','9'};
-    char istData[4];
-    istData[0] = ascii[(intnumber/1000)];
-    intnumber = intnumber % 1000;
-    istData[1] = ascii[(intnumber/100)];
-    intnumber = intnumber % 100;
-    istData[2] = ascii[(intnumber/10)];
-    intnumber = intnumber % 10;
-    istData[3] = ascii[(intnumber)];
-    Oled_Write_String( x,  y,istData);
-
-}

@@ -17,7 +17,6 @@ main.obj: C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/include/stdlib.h
 main.obj: ../Periferal_Init.h
 main.obj: ../NRF24.h
 main.obj: ../SPI.h
-main.obj: ../Oled.h
 main.obj: ../I2C.h
 main.obj: ../MAX30100.h
 main.obj: ../Filters.h
@@ -40,7 +39,6 @@ C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/include/stdlib.h:
 ../Periferal_Init.h: 
 ../NRF24.h: 
 ../SPI.h: 
-../Oled.h: 
 ../I2C.h: 
 ../MAX30100.h: 
 ../Filters.h: 
