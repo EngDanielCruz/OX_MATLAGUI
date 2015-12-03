@@ -16,8 +16,8 @@
 //                          Global Variables
 //*****************************************************************************
 //uint16_t NofSamples=4000;
-uint16_t IR_FIFO_DATA[MAXSAMPLES];
-uint16_t RED_FIFO_DATA[MAXSAMPLES];
+int32_t IR_FIFO_DATA[MAXSAMPLES];
+int32_t RED_FIFO_DATA[MAXSAMPLES];
 
 uint16_t IRsample_cnt=0;
 uint16_t REDsample_cnt=0;

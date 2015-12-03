@@ -30,5 +30,5 @@ void Accumulator_Init_values(uint8_t);
 
 //float Set_EMA_Alpha();
 
-void linear_Regression(uint16_t x[],uint16_t n,float *a,float *b,float *r);
-void Detrend(uint16_t y[],uint16_t n,float *a,float *b);
+void linear_Regression(int32_t x[],uint16_t n,float *a,float *b,float *r);
+void Detrend(int32_t y[],uint16_t n,float *a,float *b);
