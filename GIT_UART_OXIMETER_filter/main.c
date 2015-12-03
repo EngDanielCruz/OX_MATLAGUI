@@ -243,7 +243,18 @@ int main(void){
                 float r=0;
                 linear_Regression(IR_FIFO_DATA,configValues.NofSamples,&a,&b,&r);
                 Detrend(IR_FIFO_DATA,configValues.NofSamples,&a,&b);
-
+                // send IR_FIFO_DATA to UART
+                for(i=0; i<(configValues.NofSamples-1); i++){
+                  print_int( IR_FIFO_DATA[i]);
+                  printChar('\r');
+                  printChar('\n');
+                }
+                // send IR_FIFO_DATA to UART
+                for(i=0; i<(configValues.NofSamples-1); i++){
+                  print_int( RED_FIFO_DATA[i]);
+                  printChar('\r');
+                  printChar('\n');
+                }
             break;
             }
 

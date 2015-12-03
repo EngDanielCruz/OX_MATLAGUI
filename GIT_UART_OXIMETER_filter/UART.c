@@ -117,6 +117,44 @@ void print_uint( unsigned long u, uint8_t digits)
     print_String( (char *) reversed);
 }
 
+void print_int(  long i){
+
+    char digs[12], reversed[12];
+        uint8_t a = 0, b, neg = 0;
+
+        if (i < 0)
+        {
+            neg = 1;
+            i = -i;
+        }
+
+        do
+        {
+            b = i % 10;
+            digs[a] = b + 48;   // Convert to digit ASCII
+            i /= 10;
+            a++;
+        } while (i);
+
+        // Reverse the digits into most significant to least significant
+        if (neg)
+        {
+            reversed[0] = '-';
+            for (b = 1; b < a + neg; b++)
+                reversed[b] = digs[a - b];
+            a += 1; // Extend the length of the string by 1 due to - sign
+        }
+        else for (b = 0; b < a; b++)
+            reversed[b] = digs[a - b - 1];
+
+        reversed[a] = '\0';
+        print_String((char *) reversed);
+
+}
+
+
+
+
 void print_String( const char *str)
 {
     int a = 0;

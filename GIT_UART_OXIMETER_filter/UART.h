@@ -32,3 +32,4 @@ void print_uint( unsigned long u, uint8_t digits);
 void printDouble( double val);
 void process_command(void);
 void process_REGISTER_command(void);
+void print_int(  long i);
