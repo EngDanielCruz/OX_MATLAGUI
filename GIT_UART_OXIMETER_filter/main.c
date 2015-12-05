@@ -238,9 +238,9 @@ int main(void){
             }
             case 'D':  // config registers routine
             {
-                float a=0;
-                float b=0;
-                float r=0;
+                double a=0;
+                double b=0;
+                double r=0;
                 linear_Regression(IR_FIFO_DATA,(configValues.NofSamples-1),&a,&b,&r);
                 Linear_Regression1(IR_FIFO_DATA,(configValues.NofSamples-1),&a,&b,&r);
                 Detrend(IR_FIFO_DATA,(configValues.NofSamples-1),&a,&b);
