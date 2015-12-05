@@ -21,6 +21,7 @@ int32_t RED_FIFO_DATA[MAXSAMPLES];
 
 uint16_t IRsample_cnt=0;
 uint16_t REDsample_cnt=0;
+uint8_t Discardsample_cnt=0;
 // initialize the default config values
 struct confcom configValues ={MAXSAMPLES,0.4,11};
 struct configregister configresvalue   ={3,14,16,204};
@@ -105,29 +106,40 @@ if(num_available_samples >= 1){
        REDsample_cnt++;
     }
 }
-*/
+*/  if (Discardsample_cnt <10){
+    // read the fifo just to keep the read and write pointers up to date
     I2C_writeByte(FIFO_DATA_REG, I2C_WRITE, (I2C_MCS_START | I2C_MCS_RUN));
-    highByte = I2C_ReadByte( I2C_MCS_START|I2C_MCS_RUN | I2C_MCS_ACK);
-    lowByte  = I2C_ReadByte( I2C_MCS_RUN | I2C_MCS_ACK);
-    IR_FIFO_DATA[IRsample_cnt] =  (highByte << 8) | lowByte;
-    IRsample_cnt++;
+    I2C_ReadByte( I2C_MCS_START|I2C_MCS_RUN | I2C_MCS_ACK);
+    I2C_ReadByte( I2C_MCS_RUN | I2C_MCS_ACK);
 
-    highByte = I2C_ReadByte( I2C_MCS_RUN | I2C_MCS_ACK);
-    lowByte = I2C_ReadByte( I2C_MCS_RUN & (~I2C_MCS_ACK) | I2C_MCS_STOP);
-    RED_FIFO_DATA[REDsample_cnt] = (highByte << 8) | lowByte;
-    REDsample_cnt++;
+    I2C_ReadByte( I2C_MCS_RUN | I2C_MCS_ACK);
+    I2C_ReadByte( I2C_MCS_RUN & (~I2C_MCS_ACK) | I2C_MCS_STOP);
+    Discardsample_cnt++;
+    }else{
+
+        I2C_writeByte(FIFO_DATA_REG, I2C_WRITE, (I2C_MCS_START | I2C_MCS_RUN));
+        highByte = I2C_ReadByte( I2C_MCS_START|I2C_MCS_RUN | I2C_MCS_ACK);
+        lowByte  = I2C_ReadByte( I2C_MCS_RUN | I2C_MCS_ACK);
+        IR_FIFO_DATA[IRsample_cnt] =  (highByte << 8) | lowByte;
+        IRsample_cnt++;
+
+        highByte = I2C_ReadByte( I2C_MCS_RUN | I2C_MCS_ACK);
+        lowByte = I2C_ReadByte( I2C_MCS_RUN & (~I2C_MCS_ACK) | I2C_MCS_STOP);
+        RED_FIFO_DATA[REDsample_cnt] = (highByte << 8) | lowByte;
+        REDsample_cnt++;
 
 
-    if (IRsample_cnt == configValues.NofSamples-1){
-        StopSampling();
-        IRsample_cnt=0;
-        REDsample_cnt=0;
-     // send end of sampling process notification
-        printChar('A');
-        printChar('\r');
-        printChar('\n');
+        if (IRsample_cnt == configValues.NofSamples-1){
+            StopSampling();
+            IRsample_cnt=0;
+            REDsample_cnt=0;
+            Discardsample_cnt=0;
+         // send end of sampling process notification
+            printChar('A');
+            printChar('\r');
+            printChar('\n');
+        }
     }
-
     /* I2C_writeByte(FIFO_DATA_REG, I2C_WRITE, (I2C_MCS_START | I2C_MCS_RUN));
     MAX_FIFO_DATA[6]   = I2C_ReadByte( I2C_MCS_START|I2C_MCS_RUN | I2C_MCS_ACK);
     for (i=0; i< 2; i++){

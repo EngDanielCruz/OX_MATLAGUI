@@ -59,7 +59,7 @@ float EMA_Process(uint16_t Value){
 void linear_Regression(int32_t y[],uint16_t n,float *a,float *b,float *r){  // x is the FIFO_DATA array
                                                                      // a,b and r must be  previously defined and passed to array (&a,&b,&r)
     uint16_t i;
-    float x1=0,x12=0,y1=0,x1y1=0;//e;
+    float x1=0,x12=0,y1=0,x1y1=0,e;
 
       *a = 0;
       *b = 0;
@@ -79,10 +79,54 @@ void linear_Regression(int32_t y[],uint16_t n,float *a,float *b,float *r){  // x
 
       *a=(y1/n)-((*b)*x1/n);
 
-     // e=y[0]-(*a-(*b)*0);
+      e=y[0]-(*a-(*b)*0);
 
-      //*a+=e;
+      *a+=e;
 }
+
+int Linear_Regression1(int32_t y[],uint16_t n,float *a,float *b,float *r){
+    int i;
+    float sumx=0,sumy=0,sumx2=0,sumy2=0,sumxy=0;
+    float sxx,syy,sxy;
+
+       *a = 0;
+       *b = 0;
+       *r = 0;
+       if (n < 2)
+          return(0);
+
+       // Compute some things we need
+       for (i=0;i<n;i++) {
+          sumx += i;
+          sumy += y[i];
+          sumx2 += (i * i);
+          sumy2 += (y[i] * y[i]);
+          sumxy += (i * y[i]);
+       }
+       sxx = sumx2 - sumx * sumx / n;
+       syy = sumy2 - sumy * sumy / n;
+       sxy = sumxy - sumx * sumy / n;
+
+       /* Infinite slope (b), non existant intercept (a) */
+       if (abs(sxx) == 0)
+          return(0);
+
+       /* Calculate the slope (b) and intercept (a) */
+       *b = sxy / sxx;
+       *a = sumy / n - (*b) * sumx / n;
+
+       /* Compute the regression coefficient */
+       if (abs(syy) == 0)
+          *r = 1;
+       else
+          *r = sxy / sqrt(sxx * syy);
+
+       return(1);
+}
+
+
+
+
 
 void Detrend(int32_t y[],uint16_t n,float *a,float *b){
     uint16_t i;

@@ -12,6 +12,7 @@ C_SRCS += \
 ../MAX30100.c \
 ../NRF24.c \
 ../Periferal_Init.c \
+../Process_bio.c \
 ../SPI.c \
 ../UART.c \
 ../auxFile.c \
@@ -24,6 +25,7 @@ OBJS += \
 ./MAX30100.obj \
 ./NRF24.obj \
 ./Periferal_Init.obj \
+./Process_bio.obj \
 ./SPI.obj \
 ./UART.obj \
 ./auxFile.obj \
@@ -36,6 +38,7 @@ C_DEPS += \
 ./MAX30100.pp \
 ./NRF24.pp \
 ./Periferal_Init.pp \
+./Process_bio.pp \
 ./SPI.pp \
 ./UART.pp \
 ./auxFile.pp \
@@ -48,6 +51,7 @@ C_DEPS__QUOTED += \
 "MAX30100.pp" \
 "NRF24.pp" \
 "Periferal_Init.pp" \
+"Process_bio.pp" \
 "SPI.pp" \
 "UART.pp" \
 "auxFile.pp" \
@@ -60,6 +64,7 @@ OBJS__QUOTED += \
 "MAX30100.obj" \
 "NRF24.obj" \
 "Periferal_Init.obj" \
+"Process_bio.obj" \
 "SPI.obj" \
 "UART.obj" \
 "auxFile.obj" \
@@ -72,6 +77,7 @@ C_SRCS__QUOTED += \
 "../MAX30100.c" \
 "../NRF24.c" \
 "../Periferal_Init.c" \
+"../Process_bio.c" \
 "../SPI.c" \
 "../UART.c" \
 "../auxFile.c" \

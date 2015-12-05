@@ -32,3 +32,4 @@ void Accumulator_Init_values(uint8_t);
 
 void linear_Regression(int32_t x[],uint16_t n,float *a,float *b,float *r);
 void Detrend(int32_t y[],uint16_t n,float *a,float *b);
+int Linear_Regression1(int32_t y[],uint16_t n,float *a,float *b,float *r);
