@@ -185,7 +185,7 @@ int main(void){
             {
             // filter RED data
                 initPos=((configValues.taps-1)>>1)+1;       // start at 6 position for n of taps=11
-                finalPos=(4000-((configValues.taps-1)>>1));
+                finalPos=(configValues.NofSamples-((configValues.taps-1)>>1));
                 ACC=0;
                 NewValue=0;
                 Accumulator_Init_values(RED_acc);
@@ -204,7 +204,7 @@ int main(void){
             {
             // filter IR data
                 initPos=((configValues.taps-1)>>1)+1;       // start at 6 position for n of taps=11
-                finalPos=(4000-((configValues.taps-1)>>1));
+                finalPos=(configValues.NofSamples-((configValues.taps-1)>>1));
                 ACC=0;
                 NewValue=0;
                 Accumulator_Init_values(IR_acc);
@@ -241,18 +241,18 @@ int main(void){
                 double a=0;
                 double b=0;
                 double r=0;
-                linear_Regression(IR_FIFO_DATA,(configValues.NofSamples-1),&a,&b,&r);
-                Linear_Regression1(IR_FIFO_DATA,(configValues.NofSamples-1),&a,&b,&r);
-                Detrend(IR_FIFO_DATA,(configValues.NofSamples-1),&a,&b);
+                uint16_t numItems=0;
+                uint16_t  numzeros=0;
+                numItems = configValues.NofSamples-((configValues.taps-1)>>1);
+                numzeros = configValues.NofSamples-(configValues.taps-1);
+
+                Shiftarray(Filt_data, (configValues.taps-1)>>1, numItems);
+
+                Linear_Regression1(Filt_data,numzeros,&a,&b,&r);
+                Detrend(Filt_data,numzeros,&a,&b);
                 // send IR_FIFO_DATA to UART
                 for(i=0; i<(configValues.NofSamples-1); i++){
-                  print_int( IR_FIFO_DATA[i]);
-                  printChar('\r');
-                  printChar('\n');
-                }
-                // send IR_FIFO_DATA to UART
-                for(i=0; i<(configValues.NofSamples-1); i++){
-                  print_int( RED_FIFO_DATA[i]);
+                  print_int( Filt_data[i]);
                   printChar('\r');
                   printChar('\n');
                 }

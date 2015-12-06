@@ -56,7 +56,7 @@ float EMA_Process(uint16_t Value){
      return NewValue;
 }
 
-void linear_Regression(int32_t y[],uint16_t n,double *a,double *b,double *r){  // x is the FIFO_DATA array
+void linear_Regression(float y[],uint16_t n,double *a,double *b,double *r){  // x is the FIFO_DATA array
                                                                      // a,b and r must be  previously defined and passed to array (&a,&b,&r)
     uint16_t i;
     float x1=0,x12=0,y1=0,x1y1=0,e;
@@ -84,7 +84,7 @@ void linear_Regression(int32_t y[],uint16_t n,double *a,double *b,double *r){  /
       *a+=e;
 }
 
-int Linear_Regression1(int32_t y[],uint16_t n,double *a,double *b,double *r){
+int Linear_Regression1(float y[],uint16_t n,double *a,double *b,double *r){
     int i;
     double sumx=0,sumy=0,sumx2=0,sumy2=0,sumxy=0;
     double sxx,syy,sxy;
@@ -128,14 +128,21 @@ int Linear_Regression1(int32_t y[],uint16_t n,double *a,double *b,double *r){
 
 
 
-void Detrend(int32_t y[],uint16_t n,double *a,double *b){
-    uint16_t i;
+void Detrend(float y[],uint16_t n,double *a,double *b){
+    uint16_t i=0;
     for(i=0;i<n;i++) {
         y[i]=y[i]-((*a)+((*b)*i));
     }
 }
 
+void Shiftarray(float shft[], uint8_t i, uint16_t numItems){ // shift right i elements
+    uint16_t k;
+    for (k = 0; k < numItems; k++)
+    {
+        shft[k]=shft[k+i];
+    }
 
+}
 
 
 

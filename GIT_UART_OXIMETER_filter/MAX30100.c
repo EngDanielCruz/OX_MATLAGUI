@@ -106,7 +106,7 @@ if(num_available_samples >= 1){
        REDsample_cnt++;
     }
 }
-*/  if (Discardsample_cnt <10){
+*/  if (Discardsample_cnt <20){
     // read the fifo just to keep the read and write pointers up to date
     I2C_writeByte(FIFO_DATA_REG, I2C_WRITE, (I2C_MCS_START | I2C_MCS_RUN));
     I2C_ReadByte( I2C_MCS_START|I2C_MCS_RUN | I2C_MCS_ACK);
