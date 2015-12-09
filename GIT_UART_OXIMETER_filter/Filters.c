@@ -144,6 +144,20 @@ void Shiftarray(float shft[], uint8_t i, uint16_t numItems){ // shift right i el
 
 }
 
+void Find_zero_cross(float input_data[],uint16_t n,uint16_t Yzero[],uint16_t *numofzeros){
+    uint16_t i=0;
+    uint16_t j=0;
+
+    for(i=0;i<n;i++) {
+            if(signbit(input_data[i]) ^ signbit(input_data[i+1])){        // the function is discontinuous. so the zero position are in between 2 consecutive data point
+                Yzero[j]=i;                                                 // chose i to signaling the zero
+                j++;
+            }
+        }
+    *numofzeros=j;
+}
+
+
 
 
 

@@ -149,6 +149,18 @@ int main(void){
         uint8_t initPos=0;
         uint16_t finalPos=0;
         char SerialCommand;
+
+        if (bit_is_clear(GPIOF->DATA,0x4)){   // Unlock hand-shake
+            printChar('A');
+            printChar('\r');
+            printChar('\n');
+            for(i=0; i<(configValues.NofSamples-1); i++){
+                print_uint( 1111, 5);
+                printChar('\r');
+                printChar('\n');
+            }
+
+        }
 // Polling Uart receive start sampling command
         if((UART0->FR & (1<<4)) == 0){
             SerialCommand =readChar();
@@ -258,6 +270,32 @@ int main(void){
                 }
             break;
             }
+            case 'Z':
+            {
+                uint16_t i=0;
+                uint16_t  numelements=0;
+                uint16_t  numofzeros=0;
+                uint16_t Yzero[40];
+                for(i=0;i<40;i++) {
+                    Yzero[i]=0;
+                }
+                numelements = configValues.NofSamples-(configValues.taps-1);
+
+                Find_zero_cross(Filt_data,numelements, Yzero,&numofzeros);
+
+                // send the the indication of how many characters we will send
+                print_int(numofzeros);  // in matlab array start in 1
+                printChar('\r');
+                printChar('\n');
+                // send ZERO cross
+                for(i=0; i<numofzeros; i++){
+                  print_int( Yzero[i]);
+                  printChar('\r');
+                  printChar('\n');
+                }
+            break;
+            }
+
 
             default:
             {
