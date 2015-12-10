@@ -264,7 +264,7 @@ int main(void){
                 Detrend(Filt_data,numzeros,&a,&b);
                 // send IR_FIFO_DATA to UART
                 for(i=0; i<(configValues.NofSamples-1); i++){
-                  print_int( Filt_data[i]);
+                  Printfloat(Filt_data[i], 5);
                   printChar('\r');
                   printChar('\n');
                 }

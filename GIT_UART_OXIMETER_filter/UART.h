@@ -33,3 +33,4 @@ void printDouble( double val);
 void process_command(void);
 void process_REGISTER_command(void);
 void print_int(  long i);
+void Printfloat(float f, uint8_t decimal);

@@ -71,8 +71,27 @@ void UART_Init(){
         // 7. Enable the UART by setting the UARTEN bit in the UARTCTL register.
         UART0->CTL = (1<<0)|(1<<8)|(1<<9);
 }
+/*
+ * AUX FUNCTIONs
+ */
+static unsigned long power(unsigned long base, int exp)
+{
+    int res = 1;
+    int i;
+    for (i = 0; i < exp; i++)
+        res *= base;
+    return res;
+}
+
+static inline float fmod_(float x, float y)
+{
+    return x - y * ((long) (x / y));
+}
 
 
+/*
+ *
+ */
 char readChar(void)
 {
     char c;
@@ -184,6 +203,62 @@ void printDouble( double val){
        frac = (val - (int)val) * 1000;
        print_uint(frac,3);
 }
+/*
+ * void Printfloat:
+ * Outputs the floating point number f to the given number of decimal
+    places over UART.
+    decimal is the number of decimal places to output.
+*/
+void Printfloat(float f, uint8_t decimal)
+{
+    char digs[12], reversed[12];
+    uint8_t a = 0, b, neg = 0;
+
+    if (f < 0)
+    {
+        neg = 1;
+        f = -f;
+    }
+
+    if (decimal)
+    {
+        f *= power(10, decimal);
+
+        for (a = 0; a < decimal; a++)
+        {
+            b = (uint8_t) fmod_(f, 10);
+            digs[a] = b + 48;   // Convert to digit ASCII
+            f /= 10;
+        }
+
+        digs[a] = '.';
+        a++;
+    }
+
+    do
+    {
+        b = (uint8_t) fmod_(f, 10);
+        digs[a] = b + 48;   // Convert to digit ASCII
+        f /= 10;
+        a++;
+    } while ((int) f && a < 11);
+
+    // Reverse the digits into most significant to least significant
+    if (neg)
+    {
+        reversed[0] = '-';
+        for (b = 1; b < a + neg; b++)
+            reversed[b] = digs[a - b];
+        a += 1; // Extend the length of the string by 1 due to - sign
+    }
+    else for (b = 0; b < a; b++)
+        reversed[b] = digs[a - b - 1];
+
+    reversed[a] = '\0';
+    print_String((char *) reversed);
+}
+
+
 
 void readStr(uint8_t len){
    uint8_t i=0; // control counter to prevent infinite loop in case of receive failure
