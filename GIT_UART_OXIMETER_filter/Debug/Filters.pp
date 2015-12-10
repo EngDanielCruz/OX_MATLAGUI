@@ -18,6 +18,8 @@ Filters.obj: C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/include/stdarg.h
 Filters.obj: C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/include/linkage.h
 Filters.obj: C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/include/_lock.h
 Filters.obj: C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/include/float.h
+Filters.obj: C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/include/stdio.h
+Filters.obj: C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/include/stdarg.h
 
 ../Filters.c: 
 C:/Users/Dany/Documents/ti/cmsisproj/inc/LM4F120E5QR.h: 
@@ -37,3 +39,5 @@ C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/include/stdarg.h:
 C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/include/linkage.h: 
 C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/include/_lock.h: 
 C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/include/float.h: 
+C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/include/stdio.h: 
+C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/include/stdarg.h: 

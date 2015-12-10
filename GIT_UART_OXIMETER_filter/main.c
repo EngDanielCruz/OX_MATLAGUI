@@ -273,11 +273,14 @@ int main(void){
             case 'Z':
             {
                 uint16_t i=0;
-                uint16_t  numelements=0;
-                uint16_t  numofzeros=0;
+                uint8_t threshold=4;
+                uint16_t  numelements=0;   // total elements in the data array elements
+                uint16_t  numofzeros=0;   // nº of windows (when the "function" cross zero)
                 uint16_t Yzero[40];
+                uint16_t Xpeaks[40];
                 for(i=0;i<40;i++) {
                     Yzero[i]=0;
+                    Xpeaks[i]=0;
                 }
                 numelements = configValues.NofSamples-(configValues.taps-1);
 
@@ -293,6 +296,33 @@ int main(void){
                   printChar('\r');
                   printChar('\n');
                 }
+
+                // find peaks
+                // loop over all windows
+                for (i=0; i<numofzeros;i++ ){ // < deal with the last zero
+                    uint16_t winSise;
+                    uint16_t midindex;
+                    winSise =(Yzero[i+1]- Yzero[i]);
+                    midindex = ( uint16_t)(Yzero[i] + Yzero[i+1])>>1;  // (downval+upval)/2
+                    // I am interested in positive windows only
+                    // so check it
+                    if (Filt_data[midindex]>0){
+                        Xpeaks[i]=Find_peak_Recursively(Filt_data, midindex, winSise, threshold);
+                    }else {
+                        Xpeaks[i] = Find_valleys_Recursively(Filt_data, midindex, winSise, threshold);
+                     }
+                }
+                // send the the indication of how many characters we will send
+                //print_int(numofzeros);  // in matlab array start in 1
+                //printChar('\r');
+                //printChar('\n');
+                // send ZERO cross
+                for(i=0; i<numofzeros; i++){
+                   print_int( Xpeaks[i]);
+                   printChar('\r');
+                   printChar('\n');
+                }
+
             break;
             }
 

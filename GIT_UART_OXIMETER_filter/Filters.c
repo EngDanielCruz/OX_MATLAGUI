@@ -9,6 +9,7 @@
 #include "Filters.h"
 #include "MAX30100.h"
 #include <math.h>
+#include <stdio.h>
 
 //*****************************************************************************
 //                          Global Variables
@@ -156,12 +157,55 @@ void Find_zero_cross(float input_data[],uint16_t n,uint16_t Yzero[],uint16_t *nu
         }
     *numofzeros=j;
 }
+/*
+ * implement a divide and conquer algorithm  to find a peak
+ * // A binary search based function that returns index of a peak element Recursively
+ */
 
+//http://stackoverflow.com/questions/16933543/peak-element-in-an-array-in-c
+uint16_t Find_peak_Recursively(float arr[], uint16_t mid,  uint16_t n, uint8_t thrs){
 
+    // check if mid is actually a local peak
+    if ((mid == 0 || arr[mid-1] <= arr[mid]) && (mid == n-1 || arr[mid+1] <= arr[mid])){  // this is a local peak
+        return mid;
+        // apply a threshold to confirm if this local peak is a window peak
 
+    } else if (mid > 0 && (arr[mid-1] > arr[mid])){// is peak on the left side?
 
+        return Find_peak_Recursively(arr, (mid-1), n, thrs);
 
+    } else{//  peak is on the right side
+        return Find_peak_Recursively(arr, (mid+1), n, thrs);
+    }
+}
 
+uint16_t Find_valleys_Recursively(float arr[], uint16_t mid,  uint16_t n, uint8_t thrs){
+
+    // check if mid is actually a local peak
+    if ((mid == 0 || arr[mid-1] >= arr[mid]) && (mid == n-1 || arr[mid+1] >= arr[mid])){  // this is a local peak
+        // apply a threshold to confirm if this peak is a window peak
+            // is there is a value on the left side that is smallest, then this is only a local valley-> keep looking left
+            if(arr[mid-thrs] < arr[mid]){
+            //keep looking left
+                return Find_valleys_Recursively(arr, (mid-thrs), n, thrs);
+            // is there is a value on the right side that is smallest, then this is only a local valley
+            }else if (arr[mid+thrs] < arr[mid]){
+            //keep looking right
+                return Find_valleys_Recursively(arr, (mid+thrs), n, thrs);
+
+            }else {
+            //  if this arr[mid] is the smallest value in the neighborhood-> window peak
+                return mid;
+            }
+
+    } else if (mid > 0 && (arr[mid-1] < arr[mid])){// is peak on the left side?
+
+        return Find_valleys_Recursively(arr, (mid-1), n, thrs);
+
+    } else{//  peak is on the right side
+        return Find_valleys_Recursively(arr, (mid+1), n, thrs);
+    }
+}
 
 
 

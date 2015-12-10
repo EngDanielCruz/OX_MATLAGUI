@@ -35,4 +35,5 @@ void Detrend(float y[],uint16_t n,double *a,double *b);
 int Linear_Regression1(float y[],uint16_t n,double *a,double *b,double *r);
 void Shiftarray(float shft[], uint8_t i, uint16_t numItems);
 void Find_zero_cross(float input_data[],uint16_t n,uint16_t Yzero[],uint16_t *numofzeros);
-
+uint16_t Find_peak_Recursively(float arr[], uint16_t mid,  uint16_t n, uint8_t thrs);
+uint16_t Find_valleys_Recursively(float arr[], uint16_t mid,  uint16_t n, uint8_t thrs);
