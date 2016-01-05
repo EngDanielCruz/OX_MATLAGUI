@@ -297,14 +297,14 @@ int main(void){
                   printChar('\n');
                 }
 
-                // find peaks
+                // FIND PEAKS
                 // loop over all windows
                 for (i=0; i<numofzeros;i++ ){ // < deal with the last zero
                     uint16_t winSise;
                     uint16_t midindex;
                     winSise =(Yzero[i+1]- Yzero[i]);
                     midindex = ( uint16_t)(Yzero[i] + Yzero[i+1])>>1;  // (downval+upval)/2
-                    // I am interested in positive windows only
+                    // I am interested first in positive windows only
                     // so check it
                     if (Filt_data[midindex]>0){
                         Xpeaks[i]=Find_peak_Recursively(Filt_data, midindex, winSise, threshold);
@@ -322,6 +322,8 @@ int main(void){
                    printChar('\r');
                    printChar('\n');
                 }
+                Get_HeartRate(Filt_data, Xpeaks,numofzeros);
+
 
             break;
             }
