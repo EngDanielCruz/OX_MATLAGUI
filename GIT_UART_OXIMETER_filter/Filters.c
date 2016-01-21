@@ -10,6 +10,8 @@
 #include "MAX30100.h"
 #include <math.h>
 #include <stdio.h>
+#include <stdlib.h> // For malloc/free
+#include <string.h> // For memset
 
 //*****************************************************************************
 //                          Global Variables
@@ -56,6 +58,79 @@ float EMA_Process(uint16_t Value){
      ACC=NewValue;
      return NewValue;
 }
+
+
+//******************************************************************************
+//                          FIR filter
+//*******************************************************************************
+float FIR_filter_coefficients[24] =
+{
+    0.0000000, 0.0000000, 0.0000000, -0.000057451943, 0.018569749, -0.00064477335,
+    -0.026286404, 0.00048941173, 0.048723566, -0.000093083994, -0.096590053, -0.00025355128,
+    0.31503934, 0.50038721, 0.31503934, -0.00025355128, -0.096590053, -0.000093083994,
+    0.048723566, 0.00048941173, -0.026286404, -0.00064477335, 0.018569749, -0.000057451943
+};
+
+
+FIR_filterType *FIR_filter_create( void )
+{
+    FIR_filterType *result = (FIR_filterType *)malloc( sizeof( FIR_filterType ) );  // Allocate memory for the object
+    FIR_filter_init( result );                                          // Initialize it
+    return result;                                                              // Return the result
+}
+
+void FIR_filter_destroy( FIR_filterType *pObject )
+{
+    free( pObject );
+}
+
+ void FIR_filter_init( FIR_filterType * pThis )
+{
+    FIR_filter_reset( pThis );
+
+}
+
+ void FIR_filter_reset( FIR_filterType * pThis )
+{
+    memset( &pThis->state, 0, sizeof( pThis->state ) ); // Reset state to 0
+    pThis->pointer = pThis->state;                      // History buffer points to start of state buffer
+    pThis->output = 0;                                  // Reset output
+
+}
+
+ int FIR_filter_filterBlock( FIR_filterType * pThis, float * pInput, float * pOutput, unsigned int count )
+{
+    float *pOriginalOutput = pOutput;   // Save original output so we can track the number of samples processed
+    float accumulator;
+
+    for( ;count; --count )
+    {
+        pThis->pointer[FIR_filter_length] = *pInput;                        // Copy sample to top of history buffer
+        *(pThis->pointer++) = *(pInput++);                                      // Copy sample to bottom of history buffer
+
+        if( pThis->pointer >= pThis->state + FIR_filter_length )                // Handle wrap-around
+            pThis->pointer -= FIR_filter_length;
+
+        accumulator = 0;
+        FIR_filter_dotProduct( pThis->pointer, FIR_filter_coefficients, &accumulator, FIR_filter_length );
+        *(pOutput++) = accumulator; // Store the result
+    }
+
+    return pOutput - pOriginalOutput;
+
+}
+
+ void FIR_filter_dotProduct( float * pInput, float * pKernel, float * pAccumulator, short count )
+{
+    float accumulator = *pAccumulator;
+    while( count-- )
+        accumulator += ((float)*(pKernel++)) * *(pInput++);
+    *pAccumulator = accumulator;
+
+}
+
+
+//end of FIR filter
 
 void linear_Regression(float y[],uint16_t n,double *a,double *b,double *r){  // x is the FIFO_DATA array
                                                                      // a,b and r must be  previously defined and passed to array (&a,&b,&r)
