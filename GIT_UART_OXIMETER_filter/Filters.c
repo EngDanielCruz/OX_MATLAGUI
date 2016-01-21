@@ -61,8 +61,9 @@ float EMA_Process(uint16_t Value){
 
 
 //******************************************************************************
-//                          FIR filter
+// FIR filter
 //*******************************************************************************
+
 float FIR_filter_coefficients[24] =
 {
     0.0000000, 0.0000000, 0.0000000, -0.000057451943, 0.018569749, -0.00064477335,
@@ -128,7 +129,6 @@ void FIR_filter_destroy( FIR_filterType *pObject )
     *pAccumulator = accumulator;
 
 }
-
 
 //end of FIR filter
 

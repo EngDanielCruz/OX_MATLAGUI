@@ -17,13 +17,13 @@
 //*****************************************************************************
 //uint16_t NofSamples=4000;
 int32_t IR_FIFO_DATA[MAXSAMPLES];
-int32_t RED_FIFO_DATA[MAXSAMPLES];
+float RED_FIFO_DATA[MAXSAMPLES];
 
 uint16_t IRsample_cnt=0;
 uint16_t REDsample_cnt=0;
 uint8_t Discardsample_cnt=0;
 // initialize the default config values
-struct confcom configValues ={MAXSAMPLES,0.4,11};
+struct confcom configValues ={MAXSAMPLES,0.4,11,1};
 struct configregister configresvalue   ={3,14,16,204};
 
 //*****************************************************************************

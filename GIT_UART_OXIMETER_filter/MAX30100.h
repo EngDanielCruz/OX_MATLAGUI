@@ -62,6 +62,7 @@ struct confcom { // struct type to represent config commands receive in serial p
     uint16_t NofSamples;
     float alpha;
     uint16_t taps;
+    uint16_t filt_type;
 };
 struct configregister { // struct type to represent REGISTERconfig commands receive in serial port
     uint16_t modeconfig;
@@ -75,7 +76,7 @@ struct configregister { // struct type to represent REGISTERconfig commands rece
 //extern const uint16_t NofSamples;
 extern uint16_t sample_cnt;
 extern int32_t IR_FIFO_DATA[];
-extern int32_t RED_FIFO_DATA[];
+extern float RED_FIFO_DATA[];
 extern uint16_t NofSamples;
 
 //*************************************************************************
