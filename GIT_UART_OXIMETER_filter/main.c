@@ -36,6 +36,7 @@
 #include "I2C.h"
 #include "MAX30100.h"
 #include "Filters.h"
+#include "MA.h"
 #include "UART.h"
 //#include <math.h>
 
@@ -74,8 +75,8 @@ uint32_t duty_cycle;
 
 extern struct confcom configValues;
 
-extern FIR_filterType fir;
-FIR_filterType fir;           // Statically declare the FIR filter
+extern MAType fir;
+MAType fir;           // Statically declare the FIR filter
 
 //*****************************************************************************
 //                          interrupt handlers
@@ -146,7 +147,7 @@ int main(void){
 //  Send error code that inform all nodes that base node was reseted
      //Send_Error_Code(RX_RESETED,0x3);
 
-      //FIR_filter_init( &fir );                           // Initialize the filter
+      MA_init( &fir );                           // Initialize the filter
 
 
 
@@ -216,37 +217,46 @@ int main(void){
                     for(i=initPos; i<finalPos; i++){
                         Filt_data[i]= EMA_Process(RED_FIFO_DATA[i]);
                     }
+
+                }else if(configValues.filt_type==2){  // FIR filter
+
+                    for( i = 0; i < configValues.NofSamples; ++ i ){             // Loop for the length of the array
+                        MA_writeInput( (&fir), RED_FIFO_DATA[i] );              // Write one sample into the filter
+                        Filt_data[i] = MA_readOutput( (&fir) );        // Read one sample from the filter and store it in the array.
+
+                    }
+                    //FIR_destroy( fir );
+
+                }else { // IIR filter
+
+                }
                 // send RED Filt_data to UART
                     for(i=0; i<(configValues.NofSamples-1); i++){
                         printDouble( Filt_data[i]);    // send float
                         printChar('\r');
                         printChar('\n');
                     }
-                }else if(configValues.filt_type==2){  // FIR filter
-
-                    FIR_filterType *fir = FIR_filter_create();
-
-                    for( i = 0; i < configValues.NofSamples; ++ i ){             // Loop for the length of the array
-                           FIR_filter_writeInput( fir,  RED_FIFO_DATA[i] );              // Write one sample into the filter
-                           Filt_data[i] = FIR_filter_readOutput( fir );        // Read one sample from the filter and store it in the array.
-                       }
-                    FIR_filter_destroy( fir );
-
-                }else { // IIR filter
-
-                }
             break;
             }
             case 'f':    //the filter routine take 29946 clock cycles=0.007487s
             {
             // filter IR data
-                initPos=((configValues.taps-1)>>1)+1;       // start at 6 position for n of taps=11
-                finalPos=(configValues.NofSamples-((configValues.taps-1)>>1));
-                ACC=0;
-                NewValue=0;
-                Accumulator_Init_values(IR_acc);
-                for(i=initPos; i<finalPos; i++){
-                    Filt_data[i]= EMA_Process(IR_FIFO_DATA[i]);
+                if (configValues.filt_type==1){
+                    initPos=((configValues.taps-1)>>1)+1;       // start at 6 position for n of taps=11
+                    finalPos=(configValues.NofSamples-((configValues.taps-1)>>1));
+                    ACC=0;
+                    NewValue=0;
+                    Accumulator_Init_values(IR_acc);
+                    for(i=initPos; i<finalPos; i++){
+                        Filt_data[i]= EMA_Process(IR_FIFO_DATA[i]);
+                    }
+                }else if(configValues.filt_type==2){  // FIR filter
+                    for( i = 0; i < configValues.NofSamples; ++ i ){             // Loop for the length of the array
+                      MA_writeInput( (&fir), IR_FIFO_DATA[i] );              // Write one sample into the filter
+                      Filt_data[i] = MA_readOutput( (&fir) );        // Read one sample from the filter and store it in the array.
+                    }
+                }else { // IIR filter
+
                 }
            // send IR Filt_data to UART
                 for(i=0; i<(configValues.NofSamples-1); i++){

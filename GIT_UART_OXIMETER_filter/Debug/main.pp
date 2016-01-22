@@ -20,6 +20,7 @@ main.obj: ../SPI.h
 main.obj: ../I2C.h
 main.obj: ../MAX30100.h
 main.obj: ../Filters.h
+main.obj: ../MA.h
 main.obj: ../UART.h
 
 ../main.c: 
@@ -42,4 +43,5 @@ C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/include/stdlib.h:
 ../I2C.h: 
 ../MAX30100.h: 
 ../Filters.h: 
+../MA.h: 
 ../UART.h: 

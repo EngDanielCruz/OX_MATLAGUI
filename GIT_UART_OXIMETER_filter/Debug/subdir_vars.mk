@@ -9,6 +9,7 @@ CMD_SRCS += \
 C_SRCS += \
 ../Filters.c \
 ../I2C.c \
+../MA.c \
 ../MAX30100.c \
 ../NRF24.c \
 ../Periferal_Init.c \
@@ -22,6 +23,7 @@ C_SRCS += \
 OBJS += \
 ./Filters.obj \
 ./I2C.obj \
+./MA.obj \
 ./MAX30100.obj \
 ./NRF24.obj \
 ./Periferal_Init.obj \
@@ -35,6 +37,7 @@ OBJS += \
 C_DEPS += \
 ./Filters.pp \
 ./I2C.pp \
+./MA.pp \
 ./MAX30100.pp \
 ./NRF24.pp \
 ./Periferal_Init.pp \
@@ -48,6 +51,7 @@ C_DEPS += \
 C_DEPS__QUOTED += \
 "Filters.pp" \
 "I2C.pp" \
+"MA.pp" \
 "MAX30100.pp" \
 "NRF24.pp" \
 "Periferal_Init.pp" \
@@ -61,6 +65,7 @@ C_DEPS__QUOTED += \
 OBJS__QUOTED += \
 "Filters.obj" \
 "I2C.obj" \
+"MA.obj" \
 "MAX30100.obj" \
 "NRF24.obj" \
 "Periferal_Init.obj" \
@@ -74,6 +79,7 @@ OBJS__QUOTED += \
 C_SRCS__QUOTED += \
 "../Filters.c" \
 "../I2C.c" \
+"../MA.c" \
 "../MAX30100.c" \
 "../NRF24.c" \
 "../Periferal_Init.c" \

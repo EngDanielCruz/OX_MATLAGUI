@@ -22,39 +22,18 @@ extern float Filt_data[];
 extern float  ACC;
 extern float NewValue;
 //-----------------------
-static const int FIR_filter_length = 24;
-extern float FIR_filter_coefficients[24];
 
-typedef struct
-{
-    float * pointer;
-    float state[48];
-    float output;
-} FIR_filterType;
 
 //*************************************************************************
 //                          FUNCTIONS PROTOTYPES
 //*************************************************************************
-FIR_filterType *FIR_filter_create( void );
-void FIR_filter_destroy( FIR_filterType *pObject );
- void FIR_filter_init( FIR_filterType * pThis );
- void FIR_filter_reset( FIR_filterType * pThis );
-#define FIR_filter_writeInput( pThis, input )  \
-    FIR_filter_filterBlock( pThis, &input, &pThis->output, 1 );
+//******************************* FIR *********************************
 
-#define FIR_filter_readOutput( pThis )  \
-    pThis->output
 
- int FIR_filter_filterBlock( FIR_filterType * pThis, float * pInput, float * pOutput, unsigned int count );
-#define FIR_filter_outputToFloat( output )  \
-    (output)
 
-#define FIR_filter_inputFromFloat( input )  \
-    (input)
+//****************************************************************************
+//**************************************************************************
 
- void FIR_filter_dotProduct( float * pInput, float * pKernel, float * pAccumulator, short count );
-
-//--------------------------------------
 float EMA_Process(uint16_t NewValue);
 
 void Accumulator_Init_values(uint8_t);
