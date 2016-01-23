@@ -112,16 +112,16 @@ int Linear_Regression1(float y[],uint16_t n,double *a,double *b,double *r){
           return(0);
 
        // Compute some things we need
-       for (i=0;i<n;i++) {
+       for (i=configValues.taps;i<n;i++) {            // 11 filter taps-- exclude 11 first elements
           sumx += i;
           sumy += y[i];
           sumx2 += (i * i);
           sumy2 += (y[i] * y[i]);
           sumxy += (i * y[i]);
        }
-       sxx = sumx2 - sumx * sumx / n;
-       syy = sumy2 - sumy * sumy / n;
-       sxy = sumxy - sumx * sumy / n;
+       sxx = sumx2 - sumx * sumx / (n-configValues.taps);
+       syy = sumy2 - sumy * sumy / (n-configValues.taps);
+       sxy = sumxy - sumx * sumy / (n-configValues.taps);
 
        /* Infinite slope (b), non existant intercept (a) */
        if (abs(sxx) == 0)
@@ -129,7 +129,7 @@ int Linear_Regression1(float y[],uint16_t n,double *a,double *b,double *r){
 
        /* Calculate the slope (b) and intercept (a) */
        *b = sxy / sxx;
-       *a = sumy / n - (*b) * sumx / n;
+       *a = sumy / (n-configValues.taps) - (*b) * sumx / (n-configValues.taps);
 
        /* Compute the regression coefficient */
        if (abs(syy) == 0)
@@ -146,7 +146,7 @@ int Linear_Regression1(float y[],uint16_t n,double *a,double *b,double *r){
 
 void Detrend(float y[],uint16_t n,double *a,double *b){
     uint16_t i=0;
-    for(i=0;i<n;i++) {
+    for(i=configValues.taps;i<n;i++) {
         y[i]=y[i]-((*a)+((*b)*i));
     }
 }

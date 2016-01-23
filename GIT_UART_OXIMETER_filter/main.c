@@ -38,6 +38,7 @@
 #include "Filters.h"
 #include "MA.h"
 #include "UART.h"
+#include "FIR_filter.h"
 //#include <math.h>
 
 //*****************************************************************************
@@ -77,6 +78,10 @@ extern struct confcom configValues;
 
 extern MAType fir;
 MAType fir;           // Statically declare the FIR filter
+
+extern FIR_filterType fir11;
+FIR_filterType fir11;
+
 
 //*****************************************************************************
 //                          interrupt handlers
@@ -148,7 +153,7 @@ int main(void){
      //Send_Error_Code(RX_RESETED,0x3);
 
       MA_init( &fir );                           // Initialize the filter
-
+      FIR_filter_init(&fir11);
 
 
 //***************************************************************
@@ -158,8 +163,8 @@ int main(void){
 
     while (1){
         uint16_t i;
-        uint8_t initPos=0;
-        uint16_t finalPos=0;
+        //uint8_t initPos=0;
+        //uint16_t finalPos=0;
         char SerialCommand;
 
         if (bit_is_clear(GPIOF->DATA,0x4)){   // Unlock hand-shake
@@ -209,6 +214,7 @@ int main(void){
             {
             // filter RED data
                 if (configValues.filt_type==1){ // MA filter
+                    /*
                     initPos=((configValues.taps-1)>>1)+1;       // start at 6 position for n of taps=11
                     finalPos=(configValues.NofSamples-((configValues.taps-1)>>1));
                     ACC=0;
@@ -216,16 +222,15 @@ int main(void){
                     Accumulator_Init_values(RED_acc);
                     for(i=initPos; i<finalPos; i++){
                         Filt_data[i]= EMA_Process(RED_FIFO_DATA[i]);
-                    }
-
-                }else if(configValues.filt_type==2){  // FIR filter
-
+                    }*/
                     for( i = 0; i < configValues.NofSamples; ++ i ){             // Loop for the length of the array
                         MA_writeInput( (&fir), RED_FIFO_DATA[i] );              // Write one sample into the filter
                         Filt_data[i] = MA_readOutput( (&fir) );        // Read one sample from the filter and store it in the array.
 
                     }
-                    //FIR_destroy( fir );
+
+                }else if(configValues.filt_type==2){  // FIR filter
+
 
                 }else { // IIR filter
 
@@ -242,6 +247,7 @@ int main(void){
             {
             // filter IR data
                 if (configValues.filt_type==1){
+                    /*
                     initPos=((configValues.taps-1)>>1)+1;       // start at 6 position for n of taps=11
                     finalPos=(configValues.NofSamples-((configValues.taps-1)>>1));
                     ACC=0;
@@ -249,12 +255,19 @@ int main(void){
                     Accumulator_Init_values(IR_acc);
                     for(i=initPos; i<finalPos; i++){
                         Filt_data[i]= EMA_Process(IR_FIFO_DATA[i]);
-                    }
-                }else if(configValues.filt_type==2){  // FIR filter
+                    }*/
                     for( i = 0; i < configValues.NofSamples; ++ i ){             // Loop for the length of the array
                       MA_writeInput( (&fir), IR_FIFO_DATA[i] );              // Write one sample into the filter
                       Filt_data[i] = MA_readOutput( (&fir) );        // Read one sample from the filter and store it in the array.
                     }
+
+                }else if(configValues.filt_type==2){  // FIR filter
+
+                    for( i = 0; i < configValues.NofSamples; ++ i ){             // Loop for the length of the array
+                        FIR_filter_writeInput( (&fir11), IR_FIFO_DATA[i] );              // Write one sample into the filter
+                       Filt_data[i] = FIR_filter_readOutput( (&fir11) );        // Read one sample from the filter and store it in the array.
+                    }
+
                 }else { // IIR filter
 
                 }
@@ -283,20 +296,20 @@ int main(void){
 
             break;
             }
-            case 'D':  // config registers routine
+            case 'D':  // linear regression
             {
                 double a=0;
                 double b=0;
                 double r=0;
-                uint16_t numItems=0;
-                uint16_t  numzeros=0;
-                numItems = configValues.NofSamples-((configValues.taps-1)>>1);
-                numzeros = configValues.NofSamples-(configValues.taps-1);
+                //uint16_t numItems=0;
+               // uint16_t  numzeros=0;
+                //numItems = configValues.NofSamples-((configValues.taps-1)>>1);
+                //numzeros = configValues.NofSamples-(configValues.taps-1);     //n=numzeros
 
-                Shiftarray(Filt_data, (configValues.taps-1)>>1, numItems);
+                //Shiftarray(Filt_data, (configValues.taps-1)>>1, numItems);
 
-                Linear_Regression1(Filt_data,numzeros,&a,&b,&r);
-                Detrend(Filt_data,numzeros,&a,&b);
+                Linear_Regression1(Filt_data,configValues.NofSamples,&a,&b,&r);  // ATENTION 11 taps
+                Detrend(Filt_data,configValues.NofSamples,&a,&b);
                 // send IR_FIFO_DATA to UART
                 for(i=0; i<(configValues.NofSamples-1); i++){
                   Printfloat(Filt_data[i], 5);
