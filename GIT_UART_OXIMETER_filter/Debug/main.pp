@@ -20,9 +20,10 @@ main.obj: ../SPI.h
 main.obj: ../I2C.h
 main.obj: ../MAX30100.h
 main.obj: ../Filters.h
-main.obj: ../MA.h
 main.obj: ../UART.h
 main.obj: ../FIR_filter.h
+main.obj: ../MA_filter.h
+main.obj: ../Butterword_filter.h
 
 ../main.c: 
 C:/Users/Dany/Documents/ti/cmsisproj/inc/LM4F120E5QR.h: 
@@ -44,6 +45,7 @@ C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/include/stdlib.h:
 ../I2C.h: 
 ../MAX30100.h: 
 ../Filters.h: 
-../MA.h: 
 ../UART.h: 
 ../FIR_filter.h: 
+../MA_filter.h: 
+../Butterword_filter.h: 

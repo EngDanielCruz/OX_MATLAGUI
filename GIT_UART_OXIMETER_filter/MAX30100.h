@@ -75,8 +75,8 @@ struct configregister { // struct type to represent REGISTERconfig commands rece
 //extern uint8_t MAX_FIFO_DATA[64] ;
 //extern const uint16_t NofSamples;
 extern uint16_t sample_cnt;
-extern int16_t IR_FIFO_DATA[];
-extern int16_t RED_FIFO_DATA[];
+extern float IR_FIFO_DATA[];
+extern float RED_FIFO_DATA[];
 extern uint16_t NofSamples;
 
 //*************************************************************************

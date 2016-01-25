@@ -36,9 +36,10 @@
 #include "I2C.h"
 #include "MAX30100.h"
 #include "Filters.h"
-#include "MA.h"
 #include "UART.h"
 #include "FIR_filter.h"
+#include "MA_filter.h"
+#include "Butterword_filter.h"
 //#include <math.h>
 
 //*****************************************************************************
@@ -76,11 +77,15 @@ uint32_t duty_cycle;
 
 extern struct confcom configValues;
 
-extern MAType fir;
-MAType fir;           // Statically declare the FIR filter
+extern MA_filterType fir;
+MA_filterType fir;           // Statically declare the FIR filter
 
 extern FIR_filterType fir11;
 FIR_filterType fir11;
+
+extern Butterword_filterType Butterword;
+Butterword_filterType Butterword;
+
 
 
 //*****************************************************************************
@@ -152,8 +157,9 @@ int main(void){
 //  Send error code that inform all nodes that base node was reseted
      //Send_Error_Code(RX_RESETED,0x3);
 
-      MA_init( &fir );                           // Initialize the filter
+      MA_filter_init( &fir );                           // Initialize the filter
       FIR_filter_init(&fir11);
+      Butterword_filter_init(&Butterword);
 
 
 //***************************************************************
@@ -224,8 +230,8 @@ int main(void){
                         Filt_data[i]= EMA_Process(RED_FIFO_DATA[i]);
                     }*/
                     for( i = 0; i < configValues.NofSamples; ++ i ){             // Loop for the length of the array
-                        MA_writeInput( (&fir), RED_FIFO_DATA[i] );              // Write one sample into the filter
-                        Filt_data[i] = MA_readOutput( (&fir) );        // Read one sample from the filter and store it in the array.
+                        MA_filter_writeInput( (&fir), RED_FIFO_DATA[i] );              // Write one sample into the filter
+                        Filt_data[i] = MA_filter_readOutput( (&fir) );        // Read one sample from the filter and store it in the array.
 
                     }
 
@@ -257,8 +263,8 @@ int main(void){
                         Filt_data[i]= EMA_Process(IR_FIFO_DATA[i]);
                     }*/
                     for( i = 0; i < configValues.NofSamples; ++ i ){             // Loop for the length of the array
-                      MA_writeInput( (&fir), IR_FIFO_DATA[i] );              // Write one sample into the filter
-                      Filt_data[i] = MA_readOutput( (&fir) );        // Read one sample from the filter and store it in the array.
+                        MA_filter_writeInput( (&fir), IR_FIFO_DATA[i] );              // Write one sample into the filter
+                      Filt_data[i] = MA_filter_readOutput( (&fir) );        // Read one sample from the filter and store it in the array.
                     }
 
                 }else if(configValues.filt_type==2){  // FIR filter
@@ -269,6 +275,11 @@ int main(void){
                     }
 
                 }else { // IIR filter
+
+                    for( i = 0; i < configValues.NofSamples; ++ i ){             // Loop for the length of the array
+                        Butterword_filter_writeInput( (&Butterword), IR_FIFO_DATA[i] );              // Write one sample into the filter
+                       Filt_data[i] = Butterword_filter_readOutput( (&Butterword) );        // Read one sample from the filter and store it in the array.
+                   }
 
                 }
            // send IR Filt_data to UART
