@@ -11,6 +11,7 @@ GEN_CMDS__FLAG :=
 
 ORDERED_OBJS += \
 "./Butterword_filter.obj" \
+"./FIFO.obj" \
 "./FIR_filter.obj" \
 "./Filters.obj" \
 "./I2C.obj" \
@@ -21,7 +22,6 @@ ORDERED_OBJS += \
 "./Process_bio.obj" \
 "./SPI.obj" \
 "./UART.obj" \
-"./auxFile.obj" \
 "./main.obj" \
 "./startup_ccs.obj" \
 "./src/system_LM4F.obj" \
@@ -165,8 +165,8 @@ GIT_UART_OXIMETER_filter.hex: $(EXE_OUTPUTS)
 # Other Targets
 clean:
 	-$(RM) $(EXE_OUTPUTS__QUOTED)$(BIN_OUTPUTS__QUOTED)
-	-$(RM) "Butterword_filter.pp" "FIR_filter.pp" "Filters.pp" "I2C.pp" "MAX30100.pp" "MA_filter.pp" "NRF24.pp" "Periferal_Init.pp" "Process_bio.pp" "SPI.pp" "UART.pp" "auxFile.pp" "main.pp" "startup_ccs.pp" "src\system_LM4F.pp" 
-	-$(RM) "Butterword_filter.obj" "FIR_filter.obj" "Filters.obj" "I2C.obj" "MAX30100.obj" "MA_filter.obj" "NRF24.obj" "Periferal_Init.obj" "Process_bio.obj" "SPI.obj" "UART.obj" "auxFile.obj" "main.obj" "startup_ccs.obj" "src\system_LM4F.obj" 
+	-$(RM) "Butterword_filter.pp" "FIFO.pp" "FIR_filter.pp" "Filters.pp" "I2C.pp" "MAX30100.pp" "MA_filter.pp" "NRF24.pp" "Periferal_Init.pp" "Process_bio.pp" "SPI.pp" "UART.pp" "main.pp" "startup_ccs.pp" "src\system_LM4F.pp" 
+	-$(RM) "Butterword_filter.obj" "FIFO.obj" "FIR_filter.obj" "Filters.obj" "I2C.obj" "MAX30100.obj" "MA_filter.obj" "NRF24.obj" "Periferal_Init.obj" "Process_bio.obj" "SPI.obj" "UART.obj" "main.obj" "startup_ccs.obj" "src\system_LM4F.obj" 
 	-@echo 'Finished clean'
 	-@echo ' '
 

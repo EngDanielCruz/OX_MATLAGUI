@@ -8,6 +8,7 @@ CMD_SRCS += \
 
 C_SRCS += \
 ../Butterword_filter.c \
+../FIFO.c \
 ../FIR_filter.c \
 ../Filters.c \
 ../I2C.c \
@@ -18,12 +19,12 @@ C_SRCS += \
 ../Process_bio.c \
 ../SPI.c \
 ../UART.c \
-../auxFile.c \
 ../main.c \
 ../startup_ccs.c 
 
 OBJS += \
 ./Butterword_filter.obj \
+./FIFO.obj \
 ./FIR_filter.obj \
 ./Filters.obj \
 ./I2C.obj \
@@ -34,12 +35,12 @@ OBJS += \
 ./Process_bio.obj \
 ./SPI.obj \
 ./UART.obj \
-./auxFile.obj \
 ./main.obj \
 ./startup_ccs.obj 
 
 C_DEPS += \
 ./Butterword_filter.pp \
+./FIFO.pp \
 ./FIR_filter.pp \
 ./Filters.pp \
 ./I2C.pp \
@@ -50,12 +51,12 @@ C_DEPS += \
 ./Process_bio.pp \
 ./SPI.pp \
 ./UART.pp \
-./auxFile.pp \
 ./main.pp \
 ./startup_ccs.pp 
 
 C_DEPS__QUOTED += \
 "Butterword_filter.pp" \
+"FIFO.pp" \
 "FIR_filter.pp" \
 "Filters.pp" \
 "I2C.pp" \
@@ -66,12 +67,12 @@ C_DEPS__QUOTED += \
 "Process_bio.pp" \
 "SPI.pp" \
 "UART.pp" \
-"auxFile.pp" \
 "main.pp" \
 "startup_ccs.pp" 
 
 OBJS__QUOTED += \
 "Butterword_filter.obj" \
+"FIFO.obj" \
 "FIR_filter.obj" \
 "Filters.obj" \
 "I2C.obj" \
@@ -82,12 +83,12 @@ OBJS__QUOTED += \
 "Process_bio.obj" \
 "SPI.obj" \
 "UART.obj" \
-"auxFile.obj" \
 "main.obj" \
 "startup_ccs.obj" 
 
 C_SRCS__QUOTED += \
 "../Butterword_filter.c" \
+"../FIFO.c" \
 "../FIR_filter.c" \
 "../Filters.c" \
 "../I2C.c" \
@@ -98,7 +99,6 @@ C_SRCS__QUOTED += \
 "../Process_bio.c" \
 "../SPI.c" \
 "../UART.c" \
-"../auxFile.c" \
 "../main.c" \
 "../startup_ccs.c" 
 
