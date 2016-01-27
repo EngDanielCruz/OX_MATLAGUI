@@ -234,21 +234,26 @@ uint16_t Find_valleys_Recursively(float arr[], uint16_t mid,  uint16_t n, uint8_
 }
 
 
-void Get_HeartRate(float arr[],uint16_t Xpks[],uint16_t Nzeros){
+void Get_HeartRate(float arr[],uint16_t Xpks[],uint16_t Nzeros,uint8_t dSaplesMax[]){
     uint16_t Min[10];
     uint16_t Max[10];
     uint8_t j=0;
     uint8_t k=0;
     uint8_t i=0;
-    float deltaSaplesMax=0;    // IT IS A UINT CHECK PRECISION ISSUES
-    float deltaSaplesMin=0;
-    uint8_t HRM;
-    uint8_t HRm;
+    //uint8_t deltaSaplesMax[6];    // IT IS A UINT CHECK PRECISION ISSUES
+    //uint8_t deltaSaplesMin[6];
+   // uint8_t HRM;
+   // uint8_t HRm;
 //    Initialize arrays
     for(i=0;i<10;i++) {
         Min[i]=0;
         Max[i]=0;
     }
+    /*
+    for(i=0;i<6;i++) {
+        dSaplesMax[i]=0;
+        deltaSaplesMin[i]=0;
+    }*/
 // Find and separate min and max from Xpeaks array
     for (i=0; i<(Nzeros-1);i++ ){ // < deal with the last zero
         if (Filt_data[Xpks[i]]>0){
@@ -262,15 +267,21 @@ void Get_HeartRate(float arr[],uint16_t Xpks[],uint16_t Nzeros){
 // find how many´samples separate 2 consecutive max
     for (i=1; i<j+1;i++ ){
         if (Max[i]!=0){
-            deltaSaplesMax += Max[i]-Max[i-1];
+            dSaplesMax[i] = Max[i]-Max[i-1];
         }
     }
+/*
 // find how many´samples separate 2 consecutive min
         for (i=1; i<k+1;i++ ){
             if (Min[i]!=0){
-                deltaSaplesMin += Min[i]-Min[i-1];      // IT IS A UINT CHECK PRECISION ISSUES
+                deltaSaplesMin[i] = Min[i]-Min[i-1];      // IT IS A UINT CHECK PRECISION ISSUES
             }
         }
+
+
+
+
+
 // Average
         deltaSaplesMax = deltaSaplesMax/(j-1);
         deltaSaplesMin = deltaSaplesMin/(k-1);
@@ -278,7 +289,7 @@ void Get_HeartRate(float arr[],uint16_t Xpks[],uint16_t Nzeros){
 // HR in bpm
         HRM=60/(deltaSaplesMax/100);
         HRm=60/(deltaSaplesMin/100);
-
+*/
 }
 
 

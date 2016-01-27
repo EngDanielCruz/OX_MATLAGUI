@@ -13,7 +13,7 @@
 //*****************************************************************************
 //                          #defines
 //*****************************************************************************
-#define  MAXSAMPLES 2000
+#define  MAXSAMPLES 1000
 #define  IR_acc 0
 #define  RED_acc 1
 
@@ -70,6 +70,13 @@ struct configregister { // struct type to represent REGISTERconfig commands rece
     uint16_t intconfig;
     uint16_t ledconfig;
 
+};
+
+struct samplingoptions { // struct type to represent config commands receive in serial port
+    uint8_t IRRawPlot;
+    uint8_t REDRawPlot;
+    uint8_t IRPlot;
+    uint8_t RedPlot;
 };
 
 //extern uint8_t MAX_FIFO_DATA[64] ;

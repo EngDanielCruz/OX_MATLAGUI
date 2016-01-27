@@ -76,6 +76,7 @@ uint32_t duty_cycle;
 // uint8_t StatusReg[2];
 
 extern struct confcom configValues;
+extern struct samplingoptions  samplingOptions;
 
 extern MA_filterType fir;
 MA_filterType fir;           // Statically declare the FIR filter
@@ -191,13 +192,13 @@ int main(void){
 
             case 'S':
             {
-                print_uint( (configValues.NofSamples-1), 4);   // print the number of samples
-                printChar('\r');
-                printChar('\n');
+                readStr(14);
+                process_command(1);
+
                 // start sampling
-                   I2C_writeByte(INTERRUPT_STATUS, I2C_WRITE, (I2C_MCS_START | I2C_MCS_RUN));
-                   uint32_t MAX_StatusReg = I2C_ReadByte(((I2C_MCS_START | I2C_MCS_RUN | I2C_MCS_STOP)));
-                   StartSampling();
+                 //  I2C_writeByte(INTERRUPT_STATUS, I2C_WRITE, (I2C_MCS_START | I2C_MCS_RUN));
+                 //  uint32_t MAX_StatusReg = I2C_ReadByte(((I2C_MCS_START | I2C_MCS_RUN | I2C_MCS_STOP)));
+                  // StartSampling();
             break;
             }
             case 'R':  // send raw data
@@ -295,7 +296,7 @@ int main(void){
             case 'C':  // config sampling and filter routine
             {
                 readStr(14);
-                process_command();
+                process_command(0);
 
             break;
             }
@@ -319,7 +320,7 @@ int main(void){
 
                 //Shiftarray(Filt_data, (configValues.taps-1)>>1, numItems);
 
-                Linear_Regression1(Filt_data,configValues.NofSamples,&a,&b,&r);  // ATENTION 11 taps
+                Linear_Regression1(Filt_data,configValues.NofSamples-1,&a,&b,&r);  // ATENTION 11 taps
                 Detrend(Filt_data,configValues.NofSamples,&a,&b);
                 // send IR_FIFO_DATA to UART
                 for(i=0; i<(configValues.NofSamples-1); i++){
@@ -337,11 +338,12 @@ int main(void){
                 uint16_t  numofzeros=0;   // nº of windows (when the "function" cross zero)
                 uint16_t Yzero[40];
                 uint16_t Xpeaks[40];
+ //               uint8_t deltaSaplesMax[6];
                 for(i=0;i<40;i++) {
                     Yzero[i]=0;
                     Xpeaks[i]=0;
                 }
-                numelements = configValues.NofSamples-(configValues.taps-1);
+                numelements = configValues.NofSamples-2;
 
                 Find_zero_cross(Filt_data,numelements, Yzero,&numofzeros);
 
@@ -381,9 +383,14 @@ int main(void){
                    printChar('\r');
                    printChar('\n');
                 }
-                Get_HeartRate(Filt_data, Xpeaks,numofzeros);
-
-
+ //               Get_HeartRate(Filt_data, Xpeaks, numofzeros, deltaSaplesMax);
+/*
+                for(i=0; i<6; i++){
+                   print_int( deltaSaplesMax[i]);
+                   printChar('\r');
+                   printChar('\n');
+                }
+*/
             break;
             }
 

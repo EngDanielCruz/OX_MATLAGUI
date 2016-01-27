@@ -6,6 +6,9 @@ SHELL = cmd.exe
 
 CG_TOOL_ROOT := C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2
 
+GEN_OPTS__FLAG := 
+GEN_CMDS__FLAG := 
+
 ORDERED_OBJS += \
 "./Butterword_filter.obj" \
 "./FIR_filter.obj" \
@@ -149,7 +152,7 @@ all: GIT_UART_OXIMETER_filter.out
 GIT_UART_OXIMETER_filter.out: $(OBJS) $(CMD_SRCS) $(GEN_CMDS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: ARM Linker'
-	"C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 --abi=eabi -me --opt_for_speed=5 -g --gcc --define="ccs" --define=PART_LM4F120H5QR --diag_wrap=off --diag_warning=225 --display_error_number -z -m"GIT_UART_OXIMETER_filter.map" --heap_size=0 --stack_size=512 -i"C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/lib" -i"C:/ti/ccsv6/ccs_base/arm/include/CMSIS" -i"C:/Users/Dany/Documents/ti/cmsisproj/inc" -i"C:/Users/Dany/Documents/ti/cmsisproj/src" -i"C:/Users/Dany/Desktop/texas instruments/CMSIS-SP-00300-r3p1-00rel0/CMSIS/Include" -i"C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/include" --reread_libs --display_error_number --diag_wrap=off --warn_sections --xml_link_info="GIT_UART_OXIMETER_filter_linkInfo.xml" --rom_model -o "GIT_UART_OXIMETER_filter.out" $(ORDERED_OBJS)
+	"C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 --abi=eabi -me --opt_for_speed=5 -g --gcc --define="ccs" --define=PART_LM4F120H5QR --diag_warning=225 --display_error_number --diag_wrap=off -z -m"GIT_UART_OXIMETER_filter.map" --heap_size=0 --stack_size=512 -i"C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/lib" -i"C:/ti/ccsv6/ccs_base/arm/include/CMSIS" -i"C:/Users/Dany/Documents/ti/cmsisproj/inc" -i"C:/Users/Dany/Documents/ti/cmsisproj/src" -i"C:/Users/Dany/Desktop/texas instruments/CMSIS-SP-00300-r3p1-00rel0/CMSIS/Include" -i"C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/include" --reread_libs --warn_sections --diag_wrap=off --display_error_number --xml_link_info="GIT_UART_OXIMETER_filter_linkInfo.xml" --rom_model -o "GIT_UART_OXIMETER_filter.out" $(ORDERED_OBJS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 

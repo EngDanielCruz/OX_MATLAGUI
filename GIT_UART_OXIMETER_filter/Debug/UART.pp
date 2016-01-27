@@ -7,7 +7,7 @@ UART.obj: C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/include/stdint.h
 UART.obj: C:/ti/ccsv6/ccs_base/arm/include/CMSIS/core_cmInstr.h
 UART.obj: C:/ti/ccsv6/ccs_base/arm/include/CMSIS/cmsis_ccs.h
 UART.obj: C:/ti/ccsv6/ccs_base/arm/include/CMSIS/core_cmFunc.h
-UART.obj: C:/ti/ccsv6/ccs_base/arm/include/CMSIS/core_cm4_simd.h
+UART.obj: C:/ti/ccsv6/ccs_base/arm/include/CMSIS/core_cmSimd.h
 UART.obj: C:/Users/Dany/Documents/ti/cmsisproj/inc/system_LM4F.h
 UART.obj: C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/include/stdio.h
 UART.obj: C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/include/linkage.h
@@ -25,7 +25,7 @@ C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/include/stdint.h:
 C:/ti/ccsv6/ccs_base/arm/include/CMSIS/core_cmInstr.h: 
 C:/ti/ccsv6/ccs_base/arm/include/CMSIS/cmsis_ccs.h: 
 C:/ti/ccsv6/ccs_base/arm/include/CMSIS/core_cmFunc.h: 
-C:/ti/ccsv6/ccs_base/arm/include/CMSIS/core_cm4_simd.h: 
+C:/ti/ccsv6/ccs_base/arm/include/CMSIS/core_cmSimd.h: 
 C:/Users/Dany/Documents/ti/cmsisproj/inc/system_LM4F.h: 
 C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/include/stdio.h: 
 C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/include/linkage.h: 

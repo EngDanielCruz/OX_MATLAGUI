@@ -30,7 +30,7 @@ void printChar(char);
 void print_String( const char *str);
 void print_uint( unsigned long u, uint8_t digits);
 void printDouble( double val);
-void process_command(void);
+void process_command(uint8_t);
 void process_REGISTER_command(void);
 void print_int(  long i);
 void Printfloat(float f, uint8_t decimal);

@@ -20,6 +20,7 @@
 char str[16];
 extern struct confcom configValues;
 extern struct configregister configresvalue ;
+extern struct samplingoptions  samplingOptions;
 //*************************************************************************
 //                          FUNCTIONS
 //*************************************************************************
@@ -282,7 +283,7 @@ for (i=0;i<len;i++){
         }
 }
 
-void process_command(void){
+void process_command(uint8_t choose){ // choose which kind of commands should be processed
     uint8_t i=0;
     uint8_t j=0;
     uint8_t auxcnt[4]={0,0,0,0};
@@ -293,13 +294,21 @@ void process_command(void){
             j++;
         }
     }
-
-   configValues.NofSamples= atoi(strncpy ( auxarray, str, auxcnt[0] ));
-   configValues.alpha=atof(memcpy ( auxarray, &str[auxcnt[0]+1], auxcnt[1] ));
-   configValues.taps = atoi(strncpy ( auxarray, (str+auxcnt[1]+1), auxcnt[2] ));
-   configValues.filt_type = atoi(strncpy ( auxarray, (str+auxcnt[2]+1), auxcnt[3] ));
+    if (choose==0){
+       configValues.NofSamples= atoi(strncpy ( auxarray, str, auxcnt[0] ));
+       configValues.alpha=atof(memcpy ( auxarray, &str[auxcnt[0]+1], auxcnt[1] ));
+       configValues.taps = atoi(strncpy ( auxarray, (str+auxcnt[1]+1), auxcnt[2] ));
+       configValues.filt_type = atoi(strncpy ( auxarray, (str+auxcnt[2]+1), auxcnt[3] ));
+    }else {
+        samplingOptions.IRRawPlot = atoi(strncpy ( auxarray, str, auxcnt[0] ));
+        samplingOptions.REDRawPlot = atoi(strncpy ( auxarray, (str+auxcnt[0]+1), auxcnt[1] ));
+        samplingOptions.IRPlot = atoi(strncpy ( auxarray, (str+auxcnt[1]+1), auxcnt[2] ));
+        samplingOptions.RedPlot = atoi(strncpy ( auxarray, (str+auxcnt[2]+1), auxcnt[3] ));
+    }
 
 }
+
+
 
 void process_REGISTER_command(){
     uint8_t i=0;
