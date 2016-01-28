@@ -24,6 +24,7 @@ main.obj: ../UART.h
 main.obj: ../FIR_filter.h
 main.obj: ../MA_filter.h
 main.obj: ../Butterword_filter.h
+main.obj: ../FIFO.h
 
 ../main.c: 
 C:/Users/Dany/Documents/ti/cmsisproj/inc/LM4F120E5QR.h: 
@@ -49,3 +50,4 @@ C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/include/stdlib.h:
 ../FIR_filter.h: 
 ../MA_filter.h: 
 ../Butterword_filter.h: 
+../FIFO.h: 

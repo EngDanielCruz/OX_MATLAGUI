@@ -25,6 +25,15 @@ uint16_t IRsample_cnt=0;
 uint16_t REDsample_cnt=0;
 uint8_t Discardsample_cnt=0;
 uint8_t Fifocnt=0;
+float auxVar;
+float detrend_data;
+// linear regression coefficients
+double a=0;
+double b=0;
+double r=0;
+
+
+
 // initialize the default config values
 struct confcom configValues ={400,0.0,14,1};
 struct configregister configresvalue   ={3,14,16,204};
@@ -85,7 +94,7 @@ void Read_MAX_DATAFIFO(){
 
     uint8_t highByte = 0;
     uint8_t lowByte = 0;
-    float auxVar;
+    float fifoget_value;
    // uint16_t i;
    // int8_t FifoWritePTR;
    // uint8_t FifoReadPTR;
@@ -147,14 +156,16 @@ if(num_available_samples >= 1){
         Fifo_Put(auxVar);
         Fifocnt++;
         }else {  // FIFO is full keep going
-           // Fifo_Get(GetPt);  // pull out the last value
+            Fifo_Get(&fifoget_value);  // pull out the last value and dump it in fifoget_value variable
             Butterword_filter_writeInput( (&Butterword), IR_FIFO_DATA[0] );
             auxVar = Butterword_filter_readOutput( (&Butterword) );
             Fifo_Put(auxVar);  //insert new value
-            // Apply the linear regression and the detrend function
-
+            // Apply the linear regression
+            linear_Regression_fifo(&a,&b,&r);
+            // Apply the  detrend function
+            Detrend_fifo(&detrend_data,&a,&b);
             //Send values away
-
+             detrend_data=detrend_data;
 
         }
 

@@ -10,7 +10,7 @@
 #include "MAX30100.h"
 #include <math.h>
 #include <stdio.h>
-
+#include "FIFO.h"
 
 //*****************************************************************************
 //                          Global Variables
@@ -72,32 +72,43 @@ float EMA_Process(uint16_t Value){
 //*************************end of FIR filter*****************************
 //***********************************************************************
 
-void linear_Regression(float y[],uint16_t n,double *a,double *b,double *r){  // x is the FIFO_DATA array
-                                                                     // a,b and r must be  previously defined and passed to array (&a,&b,&r)
-    uint16_t i;
-    float x1=0,x12=0,y1=0,x1y1=0,e;
+void linear_Regression_fifo(double *a,double *b,double *r){  // x is the FIFO_DATA array
+    int i;
+       double sumx=0,sumy=0,sumx2=0,sumy2=0,sumxy=0;
+       double sxx,syy,sxy;
+       float aux_fifo;      // used to retrieved values from fifo
+       unsigned short size=Fifo_Size()-1;
+          *a = 0;
+          *b = 0;
+          *r = 0;
+          if (size < 2)
+          // Compute some things we need
+          for (i= 0; i< size; i++) {            // 11 filter taps-- exclude 11 first elements
+             Fifo_Get(&aux_fifo);
+             sumx += i;
+             sumy += aux_fifo;
+             sumx2 += (i * i);
+             sumy2 += (aux_fifo * aux_fifo);
+             sumxy += (i * aux_fifo);
+          }
+          sxx = sumx2 - sumx * sumx / (size);
+          syy = sumy2 - sumy * sumy / (size);
+          sxy = sumxy - sumx * sumy / (size);
 
-      *a = 0;
-      *b = 0;
-      *r = 0;
-      for(i=0;i<n;i++) {
-      x1+=i;
+          /* Infinite slope (b), non existant intercept (a) */
+          if (abs(sxx) == 0)
 
-      y1+=y[i];
+          /* Calculate the slope (b) and intercept (a) */
+          *b = sxy / sxx;
+          *a = sumy / (size) - (*b) * sumx / (size);
 
-      x1y1+=(i*y[i]);
+          /* Compute the regression coefficient */
+          if (abs(syy) == 0)
+             *r = 1;
+          else
+             *r = sxy / sqrt(sxx * syy);
+// a,b and r must be  previously defined and passed to array (&a,&b,&r)
 
-      x12+=(i*i);
-
-      }
-
-      *b = (n*x1y1-x1*y1)/(n*x12-x1*x1);
-
-      *a=(y1/n)-((*b)*x1/n);
-
-      e=y[0]-(*a-(*b)*0);
-
-      *a+=e;
 }
 
 int Linear_Regression1(float y[],uint16_t n,double *a,double *b,double *r){
@@ -149,6 +160,15 @@ void Detrend(float y[],uint16_t n,double *a,double *b){
     for(i=configValues.taps;i<n;i++) {
         y[i]=y[i]-((*a)+((*b)*i));
     }
+}
+
+void Detrend_fifo(float *data,double *a,double *b){
+    float aux_fifo;      // used to retrieved values from fifo
+    unsigned short size=Fifo_Size()-1;
+    Fifo_Get(&aux_fifo);
+
+        *data=aux_fifo-((*a)+((*b)*size+1));
+
 }
 
 void Shiftarray(float shft[], uint8_t i, uint16_t numItems){ // shift right i elements

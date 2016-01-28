@@ -40,6 +40,7 @@
 #include "FIR_filter.h"
 #include "MA_filter.h"
 #include "Butterword_filter.h"
+#include "FIFO.h"
 //#include <math.h>
 
 //*****************************************************************************
@@ -161,7 +162,7 @@ int main(void){
       MA_filter_init( &fir );                           // Initialize the filter
       FIR_filter_init(&fir11);
       Butterword_filter_init(&Butterword);
-
+      Fifo_Init();
 
 //***************************************************************
 //                       WHILE LOOP
@@ -198,9 +199,9 @@ int main(void){
                 // initialize FIFO--- don´t forget
 
                 // start sampling
-                 //  I2C_writeByte(INTERRUPT_STATUS, I2C_WRITE, (I2C_MCS_START | I2C_MCS_RUN));
-                 //  uint32_t MAX_StatusReg = I2C_ReadByte(((I2C_MCS_START | I2C_MCS_RUN | I2C_MCS_STOP)));
-                  // StartSampling();
+                   I2C_writeByte(INTERRUPT_STATUS, I2C_WRITE, (I2C_MCS_START | I2C_MCS_RUN));
+                   uint32_t MAX_StatusReg = I2C_ReadByte(((I2C_MCS_START | I2C_MCS_RUN | I2C_MCS_STOP)));
+                   StartSampling();
             break;
             }
             case 'R':  // send raw data
@@ -303,7 +304,7 @@ int main(void){
             break;
             }
             case 'L':  // config registers routine
-            {/*
+            {
                 readStr(15);
                 process_REGISTER_command();
                 Max30100_Init();
@@ -311,7 +312,7 @@ int main(void){
             break;
             }
             case 'D':  // linear regression
-            {
+            {/*
                 double a=0;
                 double b=0;
                 double r=0;
