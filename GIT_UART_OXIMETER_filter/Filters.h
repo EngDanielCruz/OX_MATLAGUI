@@ -40,7 +40,7 @@ void Accumulator_Init_values(uint8_t);
 
 //float Set_EMA_Alpha();
 
-void linear_Regression_fifo(double *a,double *b,double *r);
+int linear_Regression_fifo(double *a,double *b,double *r);
 void Detrend(float y[],uint16_t n,double *a,double *b);
 void Detrend_fifo(float *data,double *a,double *b);
 int Linear_Regression1(float y[],uint16_t n,double *a,double *b,double *r);

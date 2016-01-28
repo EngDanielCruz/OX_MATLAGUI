@@ -59,20 +59,7 @@ float EMA_Process(uint16_t Value){
 }
 
 
-//******************************************************************************
-// FIR filter
-//*******************************************************************************
-
-
-
-
-
-
-
-//*************************end of FIR filter*****************************
-//***********************************************************************
-
-void linear_Regression_fifo(double *a,double *b,double *r){  // x is the FIFO_DATA array
+int linear_Regression_fifo(double *a,double *b,double *r){  // x is the FIFO_DATA array
     int i;
        double sumx=0,sumy=0,sumx2=0,sumy2=0,sumxy=0;
        double sxx,syy,sxy;
@@ -81,7 +68,7 @@ void linear_Regression_fifo(double *a,double *b,double *r){  // x is the FIFO_DA
           *a = 0;
           *b = 0;
           *r = 0;
-          if (size < 2)
+          //if (size < 2)
           // Compute some things we need
           for (i= 0; i< size; i++) {            // 11 filter taps-- exclude 11 first elements
              Fifo_Get(&aux_fifo);
@@ -96,8 +83,9 @@ void linear_Regression_fifo(double *a,double *b,double *r){  // x is the FIFO_DA
           sxy = sumxy - sumx * sumy / (size);
 
           /* Infinite slope (b), non existant intercept (a) */
-          if (abs(sxx) == 0)
-
+          if (abs(sxx) == 0){
+             return(0);
+          }
           /* Calculate the slope (b) and intercept (a) */
           *b = sxy / sxx;
           *a = sumy / (size) - (*b) * sumx / (size);
@@ -108,7 +96,7 @@ void linear_Regression_fifo(double *a,double *b,double *r){  // x is the FIFO_DA
           else
              *r = sxy / sqrt(sxx * syy);
 // a,b and r must be  previously defined and passed to array (&a,&b,&r)
-
+          return(1);
 }
 
 int Linear_Regression1(float y[],uint16_t n,double *a,double *b,double *r){
@@ -135,9 +123,9 @@ int Linear_Regression1(float y[],uint16_t n,double *a,double *b,double *r){
        sxy = sumxy - sumx * sumy / (n-configValues.taps);
 
        /* Infinite slope (b), non existant intercept (a) */
-       if (abs(sxx) == 0)
+       if (abs(sxx) == 0){
           return(0);
-
+       }
        /* Calculate the slope (b) and intercept (a) */
        *b = sxy / sxx;
        *a = sumy / (n-configValues.taps) - (*b) * sumx / (n-configValues.taps);
