@@ -86,6 +86,7 @@ extern float IR_FIFO_DATA[];
 extern float RED_FIFO_DATA[];
 extern uint16_t NofSamples;
 
+
 //*************************************************************************
 //                          FUNCTIONS PROTOTYPES
 //*************************************************************************

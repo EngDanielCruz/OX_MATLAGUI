@@ -13,6 +13,8 @@ MAX30100.obj: ../MAX30100.h
 MAX30100.obj: ../I2C.h
 MAX30100.obj: ../Filters.h
 MAX30100.obj: ../UART.h
+MAX30100.obj: ../FIFO.h
+MAX30100.obj: ../Butterword_filter.h
 
 ../MAX30100.c: 
 C:/Users/Dany/Documents/ti/cmsisproj/inc/LM4F120E5QR.h: 
@@ -27,3 +29,5 @@ C:/Users/Dany/Documents/ti/cmsisproj/inc/system_LM4F.h:
 ../I2C.h: 
 ../Filters.h: 
 ../UART.h: 
+../FIFO.h: 
+../Butterword_filter.h: 

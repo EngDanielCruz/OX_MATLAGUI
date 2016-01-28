@@ -195,6 +195,8 @@ int main(void){
                 readStr(14);
                 process_command(1);
 
+                // initialize FIFO--- don´t forget
+
                 // start sampling
                  //  I2C_writeByte(INTERRUPT_STATUS, I2C_WRITE, (I2C_MCS_START | I2C_MCS_RUN));
                  //  uint32_t MAX_StatusReg = I2C_ReadByte(((I2C_MCS_START | I2C_MCS_RUN | I2C_MCS_STOP)));
@@ -262,7 +264,7 @@ int main(void){
                     Accumulator_Init_values(IR_acc);
                     for(i=initPos; i<finalPos; i++){
                         Filt_data[i]= EMA_Process(IR_FIFO_DATA[i]);
-                    }*/
+                    }
                     for( i = 0; i < configValues.NofSamples; ++ i ){             // Loop for the length of the array
                         MA_filter_writeInput( (&fir), IR_FIFO_DATA[i] );              // Write one sample into the filter
                       Filt_data[i] = MA_filter_readOutput( (&fir) );        // Read one sample from the filter and store it in the array.
@@ -288,7 +290,7 @@ int main(void){
                     printDouble( Filt_data[i]);    // send float
                     printChar('\r');
                     printChar('\n');
-                }
+                */}
 
             break;
             }
@@ -301,7 +303,7 @@ int main(void){
             break;
             }
             case 'L':  // config registers routine
-            {
+            {/*
                 readStr(15);
                 process_REGISTER_command();
                 Max30100_Init();
@@ -384,7 +386,7 @@ int main(void){
                    printChar('\n');
                 }
  //               Get_HeartRate(Filt_data, Xpeaks, numofzeros, deltaSaplesMax);
-/*
+
                 for(i=0; i<6; i++){
                    print_int( deltaSaplesMax[i]);
                    printChar('\r');
