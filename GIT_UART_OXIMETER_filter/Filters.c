@@ -16,7 +16,7 @@
 //                          Global Variables
 //*****************************************************************************
 extern struct confcom configValues;
-float Filt_data[MAXSAMPLES];
+double Filt_data[MAXSAMPLES];
 float  ACC=0;
 float NewValue=0;
 

@@ -19,6 +19,7 @@ C_SRCS += \
 ../Process_bio.c \
 ../SPI.c \
 ../UART.c \
+../filtfilter.c \
 ../main.c \
 ../startup_ccs.c 
 
@@ -35,6 +36,7 @@ OBJS += \
 ./Process_bio.obj \
 ./SPI.obj \
 ./UART.obj \
+./filtfilter.obj \
 ./main.obj \
 ./startup_ccs.obj 
 
@@ -51,6 +53,7 @@ C_DEPS += \
 ./Process_bio.pp \
 ./SPI.pp \
 ./UART.pp \
+./filtfilter.pp \
 ./main.pp \
 ./startup_ccs.pp 
 
@@ -67,6 +70,7 @@ C_DEPS__QUOTED += \
 "Process_bio.pp" \
 "SPI.pp" \
 "UART.pp" \
+"filtfilter.pp" \
 "main.pp" \
 "startup_ccs.pp" 
 
@@ -83,6 +87,7 @@ OBJS__QUOTED += \
 "Process_bio.obj" \
 "SPI.obj" \
 "UART.obj" \
+"filtfilter.obj" \
 "main.obj" \
 "startup_ccs.obj" 
 
@@ -99,6 +104,7 @@ C_SRCS__QUOTED += \
 "../Process_bio.c" \
 "../SPI.c" \
 "../UART.c" \
+"../filtfilter.c" \
 "../main.c" \
 "../startup_ccs.c" 
 

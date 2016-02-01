@@ -82,7 +82,7 @@ struct samplingoptions { // struct type to represent config commands receive in 
 //extern uint8_t MAX_FIFO_DATA[64] ;
 //extern const uint16_t NofSamples;
 extern uint16_t sample_cnt;
-extern float IR_FIFO_DATA[];
+extern double IR_FIFO_DATA[];
 extern float RED_FIFO_DATA[];
 extern uint16_t NofSamples;
 

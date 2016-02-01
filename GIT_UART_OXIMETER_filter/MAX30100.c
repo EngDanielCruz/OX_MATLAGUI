@@ -13,12 +13,13 @@
 #include "UART.h"
 #include "FIFO.h"
 #include "Butterword_filter.h"
+#include "filtfilter.h"
 
 //*****************************************************************************
 //                          Global Variables
 //*****************************************************************************
 //uint16_t NofSamples=4000;
-float IR_FIFO_DATA[MAXSAMPLES];
+double IR_FIFO_DATA[MAXSAMPLES];
 float RED_FIFO_DATA[MAXSAMPLES];
 
 uint16_t IRsample_cnt=0;
@@ -41,6 +42,8 @@ struct samplingoptions  samplingOptions ={0,0,0,0};
 
 extern Butterword_filterType Butterword;
 extern Butterword_filterType Butterword;
+
+double DCblock;
 
 //*****************************************************************************
 
@@ -95,7 +98,7 @@ void Read_MAX_DATAFIFO(){
     uint8_t highByte = 0;
     uint8_t lowByte = 0;
     float fifoget_value;
-   // uint16_t i;
+    uint16_t i;
    // int8_t FifoWritePTR;
    // uint8_t FifoReadPTR;
 
@@ -129,18 +132,18 @@ if(num_available_samples >= 1){
             highByte = I2C_ReadByte( I2C_MCS_START|I2C_MCS_RUN | I2C_MCS_ACK);
             lowByte  = I2C_ReadByte( I2C_MCS_RUN | I2C_MCS_ACK);
             //IR_FIFO_DATA[IRsample_cnt] =  (highByte << 8) | lowByte;
-            IRsample_cnt++;
+            //IRsample_cnt++;
             IR_FIFO_DATA[0] =  (highByte << 8) | lowByte;
 
-            Butterword_filter_writeInput( (&Butterword), IR_FIFO_DATA[0] );
+            //Butterword_filter_writeInput( (&Butterword), IR_FIFO_DATA[0] );
 
             highByte = I2C_ReadByte( I2C_MCS_RUN | I2C_MCS_ACK);
             lowByte = I2C_ReadByte( I2C_MCS_RUN & (~I2C_MCS_ACK) | I2C_MCS_STOP);
-            //RED_FIFO_DATA[REDsample_cnt] = (highByte << 8) | lowByte;
-            //REDsample_cnt++;
+           //RED_FIFO_DATA[REDsample_cnt] = (highByte << 8) | lowByte;
+           // REDsample_cnt++;
             RED_FIFO_DATA[0] = (highByte << 8) | lowByte;
 
-            Butterword_filter_writeInput( (&Butterword), IR_FIFO_DATA[0] );
+            //Butterword_filter_writeInput( (&Butterword), IR_FIFO_DATA[0] );
 
     Discardsample_cnt++;
 
@@ -149,46 +152,57 @@ if(num_available_samples >= 1){
         I2C_writeByte(FIFO_DATA_REG, I2C_WRITE, (I2C_MCS_START | I2C_MCS_RUN));
         highByte = I2C_ReadByte( I2C_MCS_START|I2C_MCS_RUN | I2C_MCS_ACK);
         lowByte  = I2C_ReadByte( I2C_MCS_RUN | I2C_MCS_ACK);
-        //IR_FIFO_DATA[IRsample_cnt] =  (highByte << 8) | lowByte;
+        IR_FIFO_DATA[IRsample_cnt] =  (highByte << 8) | lowByte;
         IRsample_cnt++;
-        IR_FIFO_DATA[0] =  (highByte << 8) | lowByte;
+        //IR_FIFO_DATA[0] =  (highByte << 8) | lowByte;
 
         highByte = I2C_ReadByte( I2C_MCS_RUN | I2C_MCS_ACK);
         lowByte = I2C_ReadByte( I2C_MCS_RUN & (~I2C_MCS_ACK) | I2C_MCS_STOP);
-        //RED_FIFO_DATA[REDsample_cnt] = (highByte << 8) | lowByte;
-        //REDsample_cnt++;
-        RED_FIFO_DATA[0] = (highByte << 8) | lowByte;
+        RED_FIFO_DATA[REDsample_cnt] = (highByte << 8) | lowByte;
+        REDsample_cnt++;
+        //RED_FIFO_DATA[0] = (highByte << 8) | lowByte;
 
         //Fill the FIFO
-        if (Fifocnt < FIFOSIZE){
+        if (Fifocnt < 399){
         // Apply the selected filter to raw value
-        Butterword_filter_writeInput( (&Butterword), IR_FIFO_DATA[0] );
+       // Butterword_filter_writeInput( (&Butterword), IR_FIFO_DATA[0] );
         // pass filtered value to the FIFO
-        auxVar = Butterword_filter_readOutput( (&Butterword) );
-        Fifo_Put(auxVar);
+        //auxVar = Butterword_filter_readOutput( (&Butterword) );
+        //Fifo_Put(auxVar);
         Fifocnt++;
         }else {  // FIFO is full keep going
-            Fifo_Get(&fifoget_value);  // pull out the last value and dump it in fifoget_value variable
-            Butterword_filter_writeInput( (&Butterword), IR_FIFO_DATA[0] );
-            auxVar = Butterword_filter_readOutput( (&Butterword) );
-            Fifo_Put(auxVar);  //insert new value
-            // Apply the linear regression
-            linear_Regression_fifo(&a,&b,&r);
-            // Apply the  detrend function
-            Detrend_fifo(&detrend_data,&a,&b);
-            //Send values away
-             detrend_data=detrend_data;
+            // process all FIFO values
+                        //Fifo_Get(&fifoget_value);  // pull out the last value and dump it in fifoget_value variable
+                        //Butterword_filter_writeInput( (&Butterword), IR_FIFO_DATA[0] );
+                        //auxVar = Butterword_filter_readOutput( (&Butterword) );
+                        //Fifo_Put(auxVar);  //insert new value
+                        // Apply the linear regression
+                        //linear_Regression_fifo(&a,&b,&r);
+                        // Apply the  detrend function
+                        //Detrend_fifo(&detrend_data,&a,&b);
+                        //Send values away
+                        //detrend_data=detrend_data;
+            // Use filtfilter to detrend and get DC values
+           /* for(i=0; i<(configValues.NofSamples); i++){
+                filtfilter(IR_FIFO_DATA,&DCblock);
+                Filt_data[i]=DCblock;
+            }*/
 
         }
 
 
 
-        if (IRsample_cnt >= configValues.NofSamples-1){
+        if (IRsample_cnt > configValues.NofSamples){
             StopSampling();
             IRsample_cnt=0;
             REDsample_cnt=0;
             Discardsample_cnt=0;
             Fifocnt=0;
+
+           // for(i=0; i<(configValues.NofSamples); i++){
+                            filtfilter(IR_FIFO_DATA,Filt_data);
+                            //Filt_data[i]=DCblock;
+           // }
          // send end of sampling process notification
             printChar('A');
             printChar('\r');
