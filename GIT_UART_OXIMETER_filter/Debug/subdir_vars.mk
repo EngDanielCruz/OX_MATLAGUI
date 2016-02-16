@@ -8,6 +8,8 @@ CMD_SRCS += \
 
 C_SRCS += \
 ../Butterword_filter.c \
+../DC2notch_filter.c \
+../DCnotch_filter.c \
 ../FIFO.c \
 ../FIR_filter.c \
 ../Filters.c \
@@ -19,12 +21,15 @@ C_SRCS += \
 ../Process_bio.c \
 ../SPI.c \
 ../UART.c \
+../bpIIR_filter.c \
 ../filtfilter.c \
 ../main.c \
 ../startup_ccs.c 
 
 OBJS += \
 ./Butterword_filter.obj \
+./DC2notch_filter.obj \
+./DCnotch_filter.obj \
 ./FIFO.obj \
 ./FIR_filter.obj \
 ./Filters.obj \
@@ -36,12 +41,15 @@ OBJS += \
 ./Process_bio.obj \
 ./SPI.obj \
 ./UART.obj \
+./bpIIR_filter.obj \
 ./filtfilter.obj \
 ./main.obj \
 ./startup_ccs.obj 
 
 C_DEPS += \
 ./Butterword_filter.pp \
+./DC2notch_filter.pp \
+./DCnotch_filter.pp \
 ./FIFO.pp \
 ./FIR_filter.pp \
 ./Filters.pp \
@@ -53,12 +61,15 @@ C_DEPS += \
 ./Process_bio.pp \
 ./SPI.pp \
 ./UART.pp \
+./bpIIR_filter.pp \
 ./filtfilter.pp \
 ./main.pp \
 ./startup_ccs.pp 
 
 C_DEPS__QUOTED += \
 "Butterword_filter.pp" \
+"DC2notch_filter.pp" \
+"DCnotch_filter.pp" \
 "FIFO.pp" \
 "FIR_filter.pp" \
 "Filters.pp" \
@@ -70,12 +81,15 @@ C_DEPS__QUOTED += \
 "Process_bio.pp" \
 "SPI.pp" \
 "UART.pp" \
+"bpIIR_filter.pp" \
 "filtfilter.pp" \
 "main.pp" \
 "startup_ccs.pp" 
 
 OBJS__QUOTED += \
 "Butterword_filter.obj" \
+"DC2notch_filter.obj" \
+"DCnotch_filter.obj" \
 "FIFO.obj" \
 "FIR_filter.obj" \
 "Filters.obj" \
@@ -87,12 +101,15 @@ OBJS__QUOTED += \
 "Process_bio.obj" \
 "SPI.obj" \
 "UART.obj" \
+"bpIIR_filter.obj" \
 "filtfilter.obj" \
 "main.obj" \
 "startup_ccs.obj" 
 
 C_SRCS__QUOTED += \
 "../Butterword_filter.c" \
+"../DC2notch_filter.c" \
+"../DCnotch_filter.c" \
 "../FIFO.c" \
 "../FIR_filter.c" \
 "../Filters.c" \
@@ -104,6 +121,7 @@ C_SRCS__QUOTED += \
 "../Process_bio.c" \
 "../SPI.c" \
 "../UART.c" \
+"../bpIIR_filter.c" \
 "../filtfilter.c" \
 "../main.c" \
 "../startup_ccs.c" 

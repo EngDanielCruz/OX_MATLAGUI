@@ -40,6 +40,8 @@
 #include "FIR_filter.h"
 #include "MA_filter.h"
 #include "Butterword_filter.h"
+#include "DCnotch_filter.h"
+#include "DC2notch_filter.h"
 #include "FIFO.h"
 //#include <math.h>
 
@@ -88,7 +90,11 @@ FIR_filterType fir11;
 extern Butterword_filterType Butterword;
 Butterword_filterType Butterword;
 
+extern DCnotch_filterType DCnotch_filter;
+DCnotch_filterType DCnotch_filter;
 
+extern DC2notch_filterType DC2notch_filter;
+DC2notch_filterType DC2notch_filter;
 
 //*****************************************************************************
 //                          interrupt handlers
@@ -162,6 +168,8 @@ int main(void){
       MA_filter_init( &fir );                           // Initialize the filter
       FIR_filter_init(&fir11);
       Butterword_filter_init(&Butterword);
+      DCnotch_filter_init(&DCnotch_filter);
+      DC2notch_filter_init(&DC2notch_filter);
       Fifo_Init();
 
 //***************************************************************
@@ -232,12 +240,12 @@ int main(void){
                     Accumulator_Init_values(RED_acc);
                     for(i=initPos; i<finalPos; i++){
                         Filt_data[i]= EMA_Process(RED_FIFO_DATA[i]);
-                    }*/
+                    }
                     for( i = 0; i < configValues.NofSamples; ++ i ){             // Loop for the length of the array
                         MA_filter_writeInput( (&fir), RED_FIFO_DATA[i] );              // Write one sample into the filter
                         Filt_data[i] = MA_filter_readOutput( (&fir) );        // Read one sample from the filter and store it in the array.
 
-                    }
+                    }*/
 
                 }else if(configValues.filt_type==2){  // FIR filter
 

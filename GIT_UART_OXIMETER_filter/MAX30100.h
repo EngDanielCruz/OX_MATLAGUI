@@ -13,7 +13,7 @@
 //*****************************************************************************
 //                          #defines
 //*****************************************************************************
-#define  MAXSAMPLES 1000
+#define  MAXSAMPLES 400
 #define  IR_acc 0
 #define  RED_acc 1
 
@@ -82,7 +82,7 @@ struct samplingoptions { // struct type to represent config commands receive in 
 //extern uint8_t MAX_FIFO_DATA[64] ;
 //extern const uint16_t NofSamples;
 extern uint16_t sample_cnt;
-extern double IR_FIFO_DATA[];
+extern float IR_FIFO_DATA[];
 extern float RED_FIFO_DATA[];
 extern uint16_t NofSamples;
 
@@ -95,6 +95,7 @@ void Max30100_Init(void);
 void Read_MAX_DATAFIFO(void);
 void StopSampling(void);
 void StartSampling(void);
+uint16_t getPeak(float arrvalue[], uint16_t indexval, uint16_t Peaks_index[]);
 
 
 
