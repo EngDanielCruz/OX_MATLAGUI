@@ -18,6 +18,7 @@
 #include "DCnotch_filter.h"
 #include "DC2notch_filter.h"
 
+
 //*****************************************************************************
 //                          Global Variables
 //*****************************************************************************
@@ -33,13 +34,13 @@ float auxVar;
 float butwrd;
 float detrend_data;
 double DC_componente[150];
-float DCnotch_Data[400];
+float DCnotch_Data[1000];
 // linear regression coefficients
 uint16_t Peaks_index[12];
 uint16_t Valleys_index[12];
 uint16_t preavPeakindex = 0;
 uint16_t j=0;
-uint16_t k=0;
+uint16_t k=1;
 float DCacumulator;
 float IR_DC;
 
@@ -52,6 +53,7 @@ extern Butterword_filterType Butterword;
 extern FIR_filterType fir11;
 extern DCnotch_filterType DCnotch_filter ;
 extern DC2notch_filterType DC2notch_filter;
+
 
 //*****************************************************************************
 
@@ -135,7 +137,7 @@ if(num_available_samples >= 1){
        REDsample_cnt++;
     }
 }
-*/  if (Discardsample_cnt <400){
+*/  if (Discardsample_cnt <100){
     // read the fifo just to keep the read and write pointers up to date
             I2C_writeByte(FIFO_DATA_REG, I2C_WRITE, (I2C_MCS_START | I2C_MCS_RUN));
             highByte = I2C_ReadByte( I2C_MCS_START|I2C_MCS_RUN | I2C_MCS_ACK);
@@ -153,8 +155,9 @@ if(num_available_samples >= 1){
             RED_FIFO_DATA[0] = (highByte << 8) | lowByte;
             // Load the filter
             //FIR_filter_writeInput( (&fir11), IR_FIFO_DATA[0] );
-            Butterword_filter_writeInput( (&Butterword), IR_FIFO_DATA[0]  );
-            DC2notch_filter_writeInput((&DC2notch_filter), IR_FIFO_DATA[0]);
+           // Butterword_filter_writeInput( (&Butterword), IR_FIFO_DATA[0]  );
+            //Filt_data[0] = Butterword_filter_readOutput( (&Butterword) );
+            //DCnotch_filter_writeInput((&DCnotch_filter), Filt_data[0]);
     Discardsample_cnt++;
 
     }else{
@@ -175,18 +178,14 @@ if(num_available_samples >= 1){
         Butterword_filter_writeInput( (&Butterword), IR_FIFO_DATA[IRsample_cnt]  );
         Filt_data[IRsample_cnt] = Butterword_filter_readOutput( (&Butterword) );
 
-        DCacumulator = Filt_data[IRsample_cnt]+DCacumulator;    //
+        //DCacumulator = Filt_data[IRsample_cnt]+DCacumulator;    //
 
         //NOTCH FILTER
-        DC2notch_filter_writeInput((&DC2notch_filter), Filt_data[IRsample_cnt]);
-        DCnotch_Data[IRsample_cnt] = DC2notch_filter_readOutput((&DC2notch_filter));
+        FIR_filter_writeInput( (&fir11), Filt_data[IRsample_cnt]);
+        DCnotch_Data[IRsample_cnt] = FIR_filter_readOutput( (&fir11) );
 
         //Check if DCnotch_Data >0 -- looking for peaks
-       /* if (DCnotch_Data[IRsample_cnt] > 0){
-            getPeak(DCnotch_Data, IRsample_cnt, Peaks_index);
-        }else{
 
-        }*/
 
         IRsample_cnt++;
         REDsample_cnt++;
@@ -204,12 +203,21 @@ if(num_available_samples >= 1){
 
 
 
-        if (IRsample_cnt > 400){
+        if (IRsample_cnt > 800){
             StopSampling();
 
+            for(i=0;i<200;i++){
+                 if (DCnotch_Data[i] > 0){
+                     getPeak(DCnotch_Data, i, Peaks_index);
+                 }else{
+
+                 }
+            }
+            i=0;
+            k=1;
             // estimate DC component
-            IR_DC = (DCacumulator /125);  // divide by N =125;
-            DC2notch_filter_reset((&DC2notch_filter));
+           // IR_DC = (DCacumulator /200);  // divide by N =125;
+            DCnotch_filter_reset((&DCnotch_filter));
             Butterword_filter_reset((&Butterword));
             DCacumulator=0;
             IRsample_cnt=0;
@@ -311,11 +319,12 @@ uint16_t getPeak(float arrvalue[], uint16_t indexval, uint16_t Peaks_index[]){
     if(arrvalue[indexval] >= arrvalue[Peaks_index[j]]){
          return Peaks_index[j]=indexval;
     }else{
-       if (k >= 3 ){
-            Peaks_index[j]=indexval;
-            j++;
-            return Peaks_index[j-1];
-        }
+               if (k >= 3 ){
+                    Peaks_index[j]=indexval;
+                    j++;
+                    k=1;
+                    return Peaks_index[j-1];
+                }
          Peaks_index[j]=indexval-k;
          k++;
          return Peaks_index[j];

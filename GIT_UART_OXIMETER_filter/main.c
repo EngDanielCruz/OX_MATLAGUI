@@ -42,6 +42,7 @@
 #include "Butterword_filter.h"
 #include "DCnotch_filter.h"
 #include "DC2notch_filter.h"
+
 #include "FIFO.h"
 //#include <math.h>
 
@@ -95,6 +96,9 @@ DCnotch_filterType DCnotch_filter;
 
 extern DC2notch_filterType DC2notch_filter;
 DC2notch_filterType DC2notch_filter;
+
+
+
 
 //*****************************************************************************
 //                          interrupt handlers
@@ -170,6 +174,7 @@ int main(void){
       Butterword_filter_init(&Butterword);
       DCnotch_filter_init(&DCnotch_filter);
       DC2notch_filter_init(&DC2notch_filter);
+
       Fifo_Init();
 
 //***************************************************************
