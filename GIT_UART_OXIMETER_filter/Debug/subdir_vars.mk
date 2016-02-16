@@ -9,6 +9,7 @@ CMD_SRCS += \
 C_SRCS += \
 ../Butterword_filter.c \
 ../DC2notch_filter.c \
+../DC_blockFIR_filter.c \
 ../DCnotch_filter.c \
 ../FIFO.c \
 ../FIR_filter.c \
@@ -29,6 +30,7 @@ C_SRCS += \
 OBJS += \
 ./Butterword_filter.obj \
 ./DC2notch_filter.obj \
+./DC_blockFIR_filter.obj \
 ./DCnotch_filter.obj \
 ./FIFO.obj \
 ./FIR_filter.obj \
@@ -49,6 +51,7 @@ OBJS += \
 C_DEPS += \
 ./Butterword_filter.pp \
 ./DC2notch_filter.pp \
+./DC_blockFIR_filter.pp \
 ./DCnotch_filter.pp \
 ./FIFO.pp \
 ./FIR_filter.pp \
@@ -69,6 +72,7 @@ C_DEPS += \
 C_DEPS__QUOTED += \
 "Butterword_filter.pp" \
 "DC2notch_filter.pp" \
+"DC_blockFIR_filter.pp" \
 "DCnotch_filter.pp" \
 "FIFO.pp" \
 "FIR_filter.pp" \
@@ -89,6 +93,7 @@ C_DEPS__QUOTED += \
 OBJS__QUOTED += \
 "Butterword_filter.obj" \
 "DC2notch_filter.obj" \
+"DC_blockFIR_filter.obj" \
 "DCnotch_filter.obj" \
 "FIFO.obj" \
 "FIR_filter.obj" \
@@ -109,6 +114,7 @@ OBJS__QUOTED += \
 C_SRCS__QUOTED += \
 "../Butterword_filter.c" \
 "../DC2notch_filter.c" \
+"../DC_blockFIR_filter.c" \
 "../DCnotch_filter.c" \
 "../FIFO.c" \
 "../FIR_filter.c" \

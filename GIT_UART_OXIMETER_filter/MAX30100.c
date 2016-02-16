@@ -17,6 +17,7 @@
 #include "FIR_filter.h"
 #include "DCnotch_filter.h"
 #include "DC2notch_filter.h"
+#include "DC_blockFIR_filter.h"
 
 
 //*****************************************************************************
@@ -53,7 +54,7 @@ extern Butterword_filterType Butterword;
 extern FIR_filterType fir11;
 extern DCnotch_filterType DCnotch_filter ;
 extern DC2notch_filterType DC2notch_filter;
-
+extern DC_blockFIR_filterType DC_blockFIR_filter;
 
 //*****************************************************************************
 
@@ -181,8 +182,8 @@ if(num_available_samples >= 1){
         //DCacumulator = Filt_data[IRsample_cnt]+DCacumulator;    //
 
         //NOTCH FILTER
-        FIR_filter_writeInput( (&fir11), Filt_data[IRsample_cnt]);
-        DCnotch_Data[IRsample_cnt] = FIR_filter_readOutput( (&fir11) );
+        DC_blockFIR_filter_writeInput( (&DC_blockFIR_filter), Filt_data[IRsample_cnt]);
+        DCnotch_Data[IRsample_cnt] = DC_blockFIR_filter_readOutput( (&DC_blockFIR_filter) );
 
         //Check if DCnotch_Data >0 -- looking for peaks
 

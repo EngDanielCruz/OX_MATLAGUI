@@ -26,6 +26,7 @@ main.obj: ../MA_filter.h
 main.obj: ../Butterword_filter.h
 main.obj: ../DCnotch_filter.h
 main.obj: ../DC2notch_filter.h
+main.obj: ../DC_blockFIR_filter.h
 main.obj: ../FIFO.h
 
 ../main.c: 
@@ -54,4 +55,5 @@ C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/include/stdlib.h:
 ../Butterword_filter.h: 
 ../DCnotch_filter.h: 
 ../DC2notch_filter.h: 
+../DC_blockFIR_filter.h: 
 ../FIFO.h: 

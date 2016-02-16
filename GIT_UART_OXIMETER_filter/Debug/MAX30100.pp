@@ -25,6 +25,7 @@ MAX30100.obj: ../filtfilter_types.h
 MAX30100.obj: ../FIR_filter.h
 MAX30100.obj: ../DCnotch_filter.h
 MAX30100.obj: ../DC2notch_filter.h
+MAX30100.obj: ../DC_blockFIR_filter.h
 
 ../MAX30100.c: 
 C:/Users/Dany/Documents/ti/cmsisproj/inc/LM4F120E5QR.h: 
@@ -51,3 +52,4 @@ C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/include/string.h:
 ../FIR_filter.h: 
 ../DCnotch_filter.h: 
 ../DC2notch_filter.h: 
+../DC_blockFIR_filter.h: 
