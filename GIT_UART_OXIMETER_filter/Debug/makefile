@@ -15,7 +15,7 @@ ORDERED_OBJS += \
 "./DC_blockFIR_filter.obj" \
 "./DCnotch_filter.obj" \
 "./FIFO.obj" \
-"./FIR_filter.obj" \
+"./FIR_LP_filter.obj" \
 "./Filters.obj" \
 "./I2C.obj" \
 "./MAX30100.obj" \
@@ -170,8 +170,8 @@ GIT_UART_OXIMETER_filter.hex: $(EXE_OUTPUTS)
 # Other Targets
 clean:
 	-$(RM) $(EXE_OUTPUTS__QUOTED)$(BIN_OUTPUTS__QUOTED)
-	-$(RM) "Butterword_filter.pp" "DC2notch_filter.pp" "DC_blockFIR_filter.pp" "DCnotch_filter.pp" "FIFO.pp" "FIR_filter.pp" "Filters.pp" "I2C.pp" "MAX30100.pp" "MA_filter.pp" "NRF24.pp" "Periferal_Init.pp" "Process_bio.pp" "SPI.pp" "UART.pp" "bpIIR_filter.pp" "filtfilter.pp" "main.pp" "startup_ccs.pp" "src\system_LM4F.pp" 
-	-$(RM) "Butterword_filter.obj" "DC2notch_filter.obj" "DC_blockFIR_filter.obj" "DCnotch_filter.obj" "FIFO.obj" "FIR_filter.obj" "Filters.obj" "I2C.obj" "MAX30100.obj" "MA_filter.obj" "NRF24.obj" "Periferal_Init.obj" "Process_bio.obj" "SPI.obj" "UART.obj" "bpIIR_filter.obj" "filtfilter.obj" "main.obj" "startup_ccs.obj" "src\system_LM4F.obj" 
+	-$(RM) "Butterword_filter.pp" "DC2notch_filter.pp" "DC_blockFIR_filter.pp" "DCnotch_filter.pp" "FIFO.pp" "FIR_LP_filter.pp" "Filters.pp" "I2C.pp" "MAX30100.pp" "MA_filter.pp" "NRF24.pp" "Periferal_Init.pp" "Process_bio.pp" "SPI.pp" "UART.pp" "bpIIR_filter.pp" "filtfilter.pp" "main.pp" "startup_ccs.pp" "src\system_LM4F.pp" 
+	-$(RM) "Butterword_filter.obj" "DC2notch_filter.obj" "DC_blockFIR_filter.obj" "DCnotch_filter.obj" "FIFO.obj" "FIR_LP_filter.obj" "Filters.obj" "I2C.obj" "MAX30100.obj" "MA_filter.obj" "NRF24.obj" "Periferal_Init.obj" "Process_bio.obj" "SPI.obj" "UART.obj" "bpIIR_filter.obj" "filtfilter.obj" "main.obj" "startup_ccs.obj" "src\system_LM4F.obj" 
 	-@echo 'Finished clean'
 	-@echo ' '
 

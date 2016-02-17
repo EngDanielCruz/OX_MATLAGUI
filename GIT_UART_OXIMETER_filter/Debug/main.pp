@@ -21,13 +21,13 @@ main.obj: ../I2C.h
 main.obj: ../MAX30100.h
 main.obj: ../Filters.h
 main.obj: ../UART.h
-main.obj: ../FIR_filter.h
 main.obj: ../MA_filter.h
 main.obj: ../Butterword_filter.h
 main.obj: ../DCnotch_filter.h
 main.obj: ../DC2notch_filter.h
 main.obj: ../DC_blockFIR_filter.h
 main.obj: ../FIFO.h
+main.obj: ../FIR_LP_filter.h
 
 ../main.c: 
 C:/Users/Dany/Documents/ti/cmsisproj/inc/LM4F120E5QR.h: 
@@ -50,10 +50,10 @@ C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/include/stdlib.h:
 ../MAX30100.h: 
 ../Filters.h: 
 ../UART.h: 
-../FIR_filter.h: 
 ../MA_filter.h: 
 ../Butterword_filter.h: 
 ../DCnotch_filter.h: 
 ../DC2notch_filter.h: 
 ../DC_blockFIR_filter.h: 
 ../FIFO.h: 
+../FIR_LP_filter.h: 

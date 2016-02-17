@@ -14,10 +14,10 @@
 #include "FIFO.h"
 #include "Butterword_filter.h"
 #include "filtfilter.h"
-#include "FIR_filter.h"
 #include "DCnotch_filter.h"
 #include "DC2notch_filter.h"
 #include "DC_blockFIR_filter.h"
+#include "FIR_LP_filter.h"
 
 
 //*****************************************************************************
@@ -51,7 +51,7 @@ struct configregister configresvalue   ={3,14,16,204};
 struct samplingoptions  samplingOptions ={0,0,0,0};
 
 extern Butterword_filterType Butterword;
-extern FIR_filterType fir11;
+extern FIR_LP_filterType FIR_LP_filter;
 extern DCnotch_filterType DCnotch_filter ;
 extern DC2notch_filterType DC2notch_filter;
 extern DC_blockFIR_filterType DC_blockFIR_filter;
@@ -138,7 +138,7 @@ if(num_available_samples >= 1){
        REDsample_cnt++;
     }
 }
-*/  if (Discardsample_cnt <100){
+*/  if (Discardsample_cnt <250){
     // read the fifo just to keep the read and write pointers up to date
             I2C_writeByte(FIFO_DATA_REG, I2C_WRITE, (I2C_MCS_START | I2C_MCS_RUN));
             highByte = I2C_ReadByte( I2C_MCS_START|I2C_MCS_RUN | I2C_MCS_ACK);
@@ -155,6 +155,9 @@ if(num_available_samples >= 1){
            // REDsample_cnt++;
             RED_FIFO_DATA[0] = (highByte << 8) | lowByte;
             // Load the filter
+            FIR_LP_filter_writeInput((&FIR_LP_filter), IR_FIFO_DATA[0]);
+            Filt_data[0] = DC_blockFIR_filter_readOutput( (&FIR_LP_filter) );
+            DC_blockFIR_filter_writeInput( (&DC_blockFIR_filter), Filt_data[0]);
             //FIR_filter_writeInput( (&fir11), IR_FIFO_DATA[0] );
            // Butterword_filter_writeInput( (&Butterword), IR_FIFO_DATA[0]  );
             //Filt_data[0] = Butterword_filter_readOutput( (&Butterword) );
@@ -176,8 +179,8 @@ if(num_available_samples >= 1){
 
         //FIR_filter_writeInput( (&fir11), IR_FIFO_DATA[IRsample_cnt] );              // Write one sample into the filter
         //Filt_data[IRsample_cnt] = FIR_filter_readOutput( (&fir11) );        // Read one sample from the filter and store it in the array.
-        Butterword_filter_writeInput( (&Butterword), IR_FIFO_DATA[IRsample_cnt]  );
-        Filt_data[IRsample_cnt] = Butterword_filter_readOutput( (&Butterword) );
+        FIR_LP_filter_writeInput( (&FIR_LP_filter), IR_FIFO_DATA[IRsample_cnt]  );
+        Filt_data[IRsample_cnt] = FIR_LP_filter_readOutput( (&FIR_LP_filter) );
 
         //DCacumulator = Filt_data[IRsample_cnt]+DCacumulator;    //
 
@@ -204,7 +207,7 @@ if(num_available_samples >= 1){
 
 
 
-        if (IRsample_cnt > 800){
+        if (IRsample_cnt > 200){
             StopSampling();
 
             for(i=0;i<200;i++){
@@ -216,6 +219,7 @@ if(num_available_samples >= 1){
             }
             i=0;
             k=1;
+            j=0;
             // estimate DC component
            // IR_DC = (DCacumulator /200);  // divide by N =125;
             DCnotch_filter_reset((&DCnotch_filter));
@@ -312,23 +316,20 @@ void StopSampling(){
 }
 
 
-uint16_t getPeak(float arrvalue[], uint16_t indexval, uint16_t Peaks_index[]){
-    if(indexval<2){
-        return 0;
-    }
+void getPeak(float arrvalue[], uint16_t indexval, uint16_t Peaks_index[]){
+
 
     if(arrvalue[indexval] >= arrvalue[Peaks_index[j]]){
-         return Peaks_index[j]=indexval;
+         Peaks_index[j]=indexval;
     }else{
-               if (k >= 3 ){
-                    Peaks_index[j]=indexval;
+               if (k >= 15 ){
+
                     j++;
+                    Peaks_index[j]=indexval;
                     k=1;
-                    return Peaks_index[j-1];
-                }
-         Peaks_index[j]=indexval-k;
+               }
+         //Peaks_index[j]=indexval-k;
          k++;
-         return Peaks_index[j];
     }
 }
 

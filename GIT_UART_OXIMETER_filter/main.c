@@ -37,7 +37,6 @@
 #include "MAX30100.h"
 #include "Filters.h"
 #include "UART.h"
-#include "FIR_filter.h"
 #include "MA_filter.h"
 #include "Butterword_filter.h"
 #include "DCnotch_filter.h"
@@ -45,6 +44,7 @@
 #include "DC_blockFIR_filter.h"
 
 #include "FIFO.h"
+#include "FIR_LP_filter.h"
 //#include <math.h>
 
 //*****************************************************************************
@@ -86,8 +86,8 @@ extern struct samplingoptions  samplingOptions;
 extern MA_filterType fir;
 MA_filterType fir;           // Statically declare the FIR filter
 
-extern FIR_filterType fir11;
-FIR_filterType fir11;
+extern FIR_LP_filterType FIR_LP_filter;
+FIR_LP_filterType FIR_LP_filter;
 
 extern Butterword_filterType Butterword;
 Butterword_filterType Butterword;
@@ -172,7 +172,7 @@ int main(void){
      //Send_Error_Code(RX_RESETED,0x3);
 
       MA_filter_init( &fir );                           // Initialize the filter
-      FIR_filter_init(&fir11);
+      FIR_LP_filter_init(&FIR_LP_filter);
       Butterword_filter_init(&Butterword);
       DCnotch_filter_init(&DCnotch_filter);
       DC2notch_filter_init(&DC2notch_filter);

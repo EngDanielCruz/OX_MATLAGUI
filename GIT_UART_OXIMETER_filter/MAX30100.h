@@ -95,7 +95,7 @@ void Max30100_Init(void);
 void Read_MAX_DATAFIFO(void);
 void StopSampling(void);
 void StartSampling(void);
-uint16_t getPeak(float arrvalue[], uint16_t indexval, uint16_t Peaks_index[]);
+void getPeak(float arrvalue[], uint16_t indexval, uint16_t Peaks_index[]);
 
 
 
