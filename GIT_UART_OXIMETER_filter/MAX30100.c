@@ -41,7 +41,6 @@ uint16_t Peaks_index[12];
 uint16_t Valleys_index[12];
 uint16_t preavPeakindex = 0;
 uint16_t j=0;
-uint16_t k=1;
 float DCacumulator;
 float IR_DC;
 
@@ -218,7 +217,6 @@ if(num_available_samples >= 1){
                  }
             }
             i=0;
-            k=1;
             j=0;
             // estimate DC component
            // IR_DC = (DCacumulator /200);  // divide by N =125;
@@ -317,20 +315,23 @@ void StopSampling(){
 
 
 void getPeak(float arrvalue[], uint16_t indexval, uint16_t Peaks_index[]){
+//j-> variable to keep track of the next Peak_index index element
 
-
-    if(arrvalue[indexval] >= arrvalue[Peaks_index[j]]){
-         Peaks_index[j]=indexval;
-    }else{
-               if (k >= 15 ){
-
-                    j++;
-                    Peaks_index[j]=indexval;
-                    k=1;
-               }
-         //Peaks_index[j]=indexval-k;
-         k++;
+    // We need at least 3 samples to compute the 2 slopes necessaries for peak detection
+    // check if indexval >=2
+    if (indexval >= 2){
+        // check if f(indexval)>0
+        if(arrvalue[indexval]>0){
+            // check if the solpe1 is >0 and slop2 is <0
+            if(((arrvalue[indexval-1]-arrvalue[indexval-2])>0) && ((arrvalue[indexval]-arrvalue[indexval-1])<=0)){
+                //arrvalue[indexval] is a local peak
+                Peaks_index[j]= indexval-1;    // store the peak index in Peaks_index array
+                j++;
+            }
+        }
     }
+
+
 }
 
 
