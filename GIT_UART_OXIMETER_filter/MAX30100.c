@@ -36,12 +36,15 @@ float butwrd;
 float detrend_data;
 double DC_componente[150];
 float DCnotch_Data[1000];
-// linear regression coefficients
+float IRrms;
+float REDrms;
+uint8_t Nofpeacks;
 uint16_t Peaks_index[12];
-uint16_t Valleys_index[12];
 uint16_t preavPeakindex = 0;
 uint16_t j=0;
+uint8_t HR[11];
 float DCacumulator;
+float RMSacumulator;
 float IR_DC;
 
 // initialize the default config values
@@ -108,7 +111,7 @@ void Read_MAX_DATAFIFO(){
 
     uint8_t highByte = 0;
     uint8_t lowByte = 0;
-    float fifoget_value;
+    //float fifoget_value;
     uint16_t i;
    // int8_t FifoWritePTR;
    // uint8_t FifoReadPTR;
@@ -181,11 +184,13 @@ if(num_available_samples >= 1){
         FIR_LP_filter_writeInput( (&FIR_LP_filter), IR_FIFO_DATA[IRsample_cnt]  );
         Filt_data[IRsample_cnt] = FIR_LP_filter_readOutput( (&FIR_LP_filter) );
 
-        //DCacumulator = Filt_data[IRsample_cnt]+DCacumulator;    //
+        DCacumulator = Filt_data[IRsample_cnt]+DCacumulator;    //
 
         //NOTCH FILTER
         DC_blockFIR_filter_writeInput( (&DC_blockFIR_filter), Filt_data[IRsample_cnt]);
         DCnotch_Data[IRsample_cnt] = DC_blockFIR_filter_readOutput( (&DC_blockFIR_filter) );
+
+        RMSacumulator= (DCnotch_Data[IRsample_cnt] * DCnotch_Data[IRsample_cnt]) + RMSacumulator;
 
         //Check if DCnotch_Data >0 -- looking for peaks
 
@@ -211,18 +216,24 @@ if(num_available_samples >= 1){
 
             for(i=0;i<200;i++){
                  if (DCnotch_Data[i] > 0){
-                     getPeak(DCnotch_Data, i, Peaks_index);
+                     getPeak(DCnotch_Data, i, Peaks_index,&Nofpeacks);
                  }else{
 
                  }
             }
             i=0;
             j=0;
+            // calculate the sqrt using PFU sqrt.f32 instruction
+            IRrms= (__sqrtf(RMSacumulator*0.005)); // intrinsic to bypass the overhead of calling sqrtf
             // estimate DC component
-           // IR_DC = (DCacumulator /200);  // divide by N =125;
+            IR_DC = (DCacumulator*0.005);  // divide by N =200;
+            // get heart rate
+            Get_HRate(&Nofpeacks, HR);
+
             DCnotch_filter_reset((&DCnotch_filter));
             Butterword_filter_reset((&Butterword));
             DCacumulator=0;
+            RMSacumulator=0;
             IRsample_cnt=0;
             REDsample_cnt=0;
             Discardsample_cnt=0;
@@ -314,7 +325,7 @@ void StopSampling(){
 }
 
 
-void getPeak(float arrvalue[], uint16_t indexval, uint16_t Peaks_index[]){
+void getPeak(float arrvalue[], uint16_t indexval, uint16_t Peaks_index[],uint8_t *npeaks){
 //j-> variable to keep track of the next Peak_index index element
 
     // We need at least 3 samples to compute the 2 slopes necessaries for peak detection
@@ -331,11 +342,23 @@ void getPeak(float arrvalue[], uint16_t indexval, uint16_t Peaks_index[]){
         }
     }
 
-
+    *npeaks=j;
 }
 
+void Get_HRate(uint8_t *nofpeaks,uint8_t Hr[]){
+
+    uint8_t i=0;
+    uint16_t SampMax[11];
+// find how many´samples separate 2 consecutive max
+    for (i=1; i<*nofpeaks;i++ ){
+        if (Peaks_index[i]!=0){      // just to make sure that we don´t iterate beyond the number of peaks
+            SampMax[i-1] = Peaks_index[i]-Peaks_index[i-1];
+            Hr[i-1]=60/(SampMax[i-1]*0.02);  // 1/50=0.02
+        }
+    }
 
 
+}
 
 
 
