@@ -42,7 +42,7 @@ uint8_t Nofpeacks;
 uint16_t Peaks_index[12];
 uint16_t preavPeakindex = 0;
 uint16_t j=0;
-uint8_t HR[11];
+float HR[11];
 float DCacumulator;
 float RMSacumulator;
 float IR_DC;
@@ -224,9 +224,9 @@ if(num_available_samples >= 1){
             i=0;
             j=0;
             // calculate the sqrt using PFU sqrt.f32 instruction
-            IRrms= (__sqrtf(RMSacumulator*0.005)); // intrinsic to bypass the overhead of calling sqrtf
+            IRrms= (__sqrtf(RMSacumulator/200)); // intrinsic to bypass the overhead of calling sqrtf
             // estimate DC component
-            IR_DC = (DCacumulator*0.005);  // divide by N =200;
+            IR_DC = (DCacumulator/200);  // divide by N =200;
             // get heart rate
             Get_HRate(&Nofpeacks, HR);
 
@@ -345,7 +345,7 @@ void getPeak(float arrvalue[], uint16_t indexval, uint16_t Peaks_index[],uint8_t
     *npeaks=j;
 }
 
-void Get_HRate(uint8_t *nofpeaks,uint8_t Hr[]){
+void Get_HRate(uint8_t *nofpeaks,float Hr[]){
 
     uint8_t i=0;
     uint16_t SampMax[11];
@@ -353,11 +353,8 @@ void Get_HRate(uint8_t *nofpeaks,uint8_t Hr[]){
     for (i=1; i<*nofpeaks;i++ ){
         if (Peaks_index[i]!=0){      // just to make sure that we don´t iterate beyond the number of peaks
             SampMax[i-1] = Peaks_index[i]-Peaks_index[i-1];
-            Hr[i-1]=60/(SampMax[i-1]*0.02);  // 1/50=0.02
-        }
-    }
-
-
+            Hr[i-1]=60/(((float)SampMax[i-1])/50);  // The use of floats make the process faster. Declaring Hr
+    }                                               // as float make the process faster to.
 }
 
 
