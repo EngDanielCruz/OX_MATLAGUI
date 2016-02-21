@@ -89,6 +89,9 @@ MA_filterType fir;           // Statically declare the FIR filter
 extern FIR_LP_filterType FIR_LP_filter;
 FIR_LP_filterType FIR_LP_filter;
 
+extern FIR_LP_filterType FIR_RED_LP_filter;
+FIR_LP_filterType FIR_RED_LP_filter;
+
 extern Butterword_filterType Butterword;
 Butterword_filterType Butterword;
 
@@ -98,8 +101,11 @@ DCnotch_filterType DCnotch_filter;
 extern DC2notch_filterType DC2notch_filter;
 DC2notch_filterType DC2notch_filter;
 
-extern DC_blockFIR_filterType DC_blockFIR_filter;
+extern DC_blockFIR_filterType DC_blockFIR_filter;  // Object to filter IR
 DC_blockFIR_filterType DC_blockFIR_filter;
+
+extern DC_blockFIR_filterType DC_block_RED_FIR_filter;  // Object to filter IR
+DC_blockFIR_filterType DC_block_RED_FIR_filter;
 
 
 //*****************************************************************************
@@ -173,10 +179,12 @@ int main(void){
 
       MA_filter_init( &fir );                           // Initialize the filter
       FIR_LP_filter_init(&FIR_LP_filter);
+      FIR_LP_filter_init(&FIR_RED_LP_filter);
       Butterword_filter_init(&Butterword);
       DCnotch_filter_init(&DCnotch_filter);
       DC2notch_filter_init(&DC2notch_filter);
       DC_blockFIR_filter_init( &DC_blockFIR_filter);
+      DC_blockFIR_filter_init( &DC_block_RED_FIR_filter);
 
       Fifo_Init();
 
@@ -263,7 +271,7 @@ int main(void){
                 }
                 // send RED Filt_data to UART
                     for(i=0; i<(configValues.NofSamples-1); i++){
-                        printDouble( Filt_data[i]);    // send float
+                        printDouble( Filt_IRdata[i]);    // send float
                         printChar('\r');
                         printChar('\n');
                     }

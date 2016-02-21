@@ -16,7 +16,7 @@
 //                          Global Variables
 //*****************************************************************************
 extern struct confcom configValues;
-float Filt_data[MAXSAMPLES];//
+//float Filt_data[MAXSAMPLES];//
 float  ACC=0;
 float NewValue=0;
 
@@ -243,7 +243,7 @@ uint16_t Find_valleys_Recursively(float arr[], uint16_t mid,  uint16_t n, uint8_
 
 
 void Get_HeartRate(float arr[],uint16_t Xpks[],uint16_t Nzeros,uint8_t dSaplesMax[]){
-    uint16_t Min[10];
+  /*  uint16_t Min[10];
     uint16_t Max[10];
     uint8_t j=0;
     uint8_t k=0;
@@ -257,11 +257,11 @@ void Get_HeartRate(float arr[],uint16_t Xpks[],uint16_t Nzeros,uint8_t dSaplesMa
         Min[i]=0;
         Max[i]=0;
     }
-    /*
+
     for(i=0;i<6;i++) {
         dSaplesMax[i]=0;
         deltaSaplesMin[i]=0;
-    }*/
+    }
 // Find and separate min and max from Xpeaks array
     for (i=0; i<(Nzeros-1);i++ ){ // < deal with the last zero
         if (Filt_data[Xpks[i]]>0){
@@ -278,7 +278,7 @@ void Get_HeartRate(float arr[],uint16_t Xpks[],uint16_t Nzeros,uint8_t dSaplesMa
             dSaplesMax[i] = Max[i]-Max[i-1];
         }
     }
-/*
+
 // find how many´samples separate 2 consecutive min
         for (i=1; i<k+1;i++ ){
             if (Min[i]!=0){
@@ -298,6 +298,7 @@ void Get_HeartRate(float arr[],uint16_t Xpks[],uint16_t Nzeros,uint8_t dSaplesMa
         HRM=60/(deltaSaplesMax/100);
         HRm=60/(deltaSaplesMin/100);
 */
+
 }
 
 

@@ -13,7 +13,6 @@ C_SRCS += \
 ../DCnotch_filter.c \
 ../FIFO.c \
 ../FIR_LP_filter.c \
-../Filters.c \
 ../I2C.c \
 ../MAX30100.c \
 ../MA_filter.c \
@@ -34,7 +33,6 @@ OBJS += \
 ./DCnotch_filter.obj \
 ./FIFO.obj \
 ./FIR_LP_filter.obj \
-./Filters.obj \
 ./I2C.obj \
 ./MAX30100.obj \
 ./MA_filter.obj \
@@ -55,7 +53,6 @@ C_DEPS += \
 ./DCnotch_filter.pp \
 ./FIFO.pp \
 ./FIR_LP_filter.pp \
-./Filters.pp \
 ./I2C.pp \
 ./MAX30100.pp \
 ./MA_filter.pp \
@@ -76,7 +73,6 @@ C_DEPS__QUOTED += \
 "DCnotch_filter.pp" \
 "FIFO.pp" \
 "FIR_LP_filter.pp" \
-"Filters.pp" \
 "I2C.pp" \
 "MAX30100.pp" \
 "MA_filter.pp" \
@@ -97,7 +93,6 @@ OBJS__QUOTED += \
 "DCnotch_filter.obj" \
 "FIFO.obj" \
 "FIR_LP_filter.obj" \
-"Filters.obj" \
 "I2C.obj" \
 "MAX30100.obj" \
 "MA_filter.obj" \
@@ -118,7 +113,6 @@ C_SRCS__QUOTED += \
 "../DCnotch_filter.c" \
 "../FIFO.c" \
 "../FIR_LP_filter.c" \
-"../Filters.c" \
 "../I2C.c" \
 "../MAX30100.c" \
 "../MA_filter.c" \

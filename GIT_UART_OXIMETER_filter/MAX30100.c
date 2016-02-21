@@ -26,16 +26,15 @@
 //uint16_t NofSamples=4000;
 float IR_FIFO_DATA[MAXSAMPLES];
 float RED_FIFO_DATA[MAXSAMPLES];
+float Filt_IRdata[MAXSAMPLES];//
+float Filt_REDdata[MAXSAMPLES];
 
 uint16_t IRsample_cnt=0;
 uint16_t REDsample_cnt=0;
 uint16_t Discardsample_cnt=0;
 uint8_t Fifocnt=0;
-float auxVar;
-float butwrd;
-float detrend_data;
-double DC_componente[150];
-float DCnotch_Data[1000];
+float DCnotch_Data[200];
+float DC_RED_notch_Data[200];
 float IRrms;
 float REDrms;
 uint8_t Nofpeacks;
@@ -44,8 +43,11 @@ uint16_t preavPeakindex = 0;
 uint16_t j=0;
 float HR[11];
 float DCacumulator;
+float DC_RED_acumulator;
 float RMSacumulator;
+float RMS_RED_acumulator;
 float IR_DC;
+float RED_DC;
 
 // initialize the default config values
 struct confcom configValues ={400,0.0,14,1};
@@ -54,9 +56,12 @@ struct samplingoptions  samplingOptions ={0,0,0,0};
 
 extern Butterword_filterType Butterword;
 extern FIR_LP_filterType FIR_LP_filter;
+extern FIR_LP_filterType FIR_RED_LP_filter;
 extern DCnotch_filterType DCnotch_filter ;
 extern DC2notch_filterType DC2notch_filter;
 extern DC_blockFIR_filterType DC_blockFIR_filter;
+extern DC_blockFIR_filterType DC_block_RED_FIR_filter;
+
 
 //*****************************************************************************
 
@@ -158,8 +163,13 @@ if(num_available_samples >= 1){
             RED_FIFO_DATA[0] = (highByte << 8) | lowByte;
             // Load the filter
             FIR_LP_filter_writeInput((&FIR_LP_filter), IR_FIFO_DATA[0]);
-            Filt_data[0] = DC_blockFIR_filter_readOutput( (&FIR_LP_filter) );
-            DC_blockFIR_filter_writeInput( (&DC_blockFIR_filter), Filt_data[0]);
+            Filt_IRdata[0] = FIR_LP_filter_readOutput( (&FIR_LP_filter) );
+            DC_blockFIR_filter_writeInput( (&DC_blockFIR_filter), Filt_IRdata[0]);
+
+            FIR_LP_filter_writeInput((&FIR_RED_LP_filter), RED_FIFO_DATA[0]);
+            Filt_REDdata[0] = FIR_LP_filter_readOutput( (&FIR_RED_LP_filter) );
+            DC_blockFIR_filter_writeInput( (&DC_block_RED_FIR_filter), Filt_REDdata[0]);
+
             //FIR_filter_writeInput( (&fir11), IR_FIFO_DATA[0] );
            // Butterword_filter_writeInput( (&Butterword), IR_FIFO_DATA[0]  );
             //Filt_data[0] = Butterword_filter_readOutput( (&Butterword) );
@@ -179,19 +189,24 @@ if(num_available_samples >= 1){
         RED_FIFO_DATA[REDsample_cnt] = ((highByte << 8) | lowByte);
 
 
-        //FIR_filter_writeInput( (&fir11), IR_FIFO_DATA[IRsample_cnt] );              // Write one sample into the filter
-        //Filt_data[IRsample_cnt] = FIR_filter_readOutput( (&fir11) );        // Read one sample from the filter and store it in the array.
-        FIR_LP_filter_writeInput( (&FIR_LP_filter), IR_FIFO_DATA[IRsample_cnt]  );
-        Filt_data[IRsample_cnt] = FIR_LP_filter_readOutput( (&FIR_LP_filter) );
+        FIR_LP_filter_writeInput( (&FIR_LP_filter), IR_FIFO_DATA[IRsample_cnt]  );       // Write one sample into the filter
+        Filt_IRdata[IRsample_cnt] = FIR_LP_filter_readOutput( (&FIR_LP_filter) );       // Read one sample from the filter and store it in the array.
 
-        DCacumulator = Filt_data[IRsample_cnt]+DCacumulator;    //
+        FIR_LP_filter_writeInput((&FIR_RED_LP_filter), RED_FIFO_DATA[REDsample_cnt]);
+        Filt_REDdata[REDsample_cnt] = FIR_LP_filter_readOutput( (&FIR_RED_LP_filter) );
+
+        DCacumulator = Filt_IRdata[IRsample_cnt]+DCacumulator;    // 52 clock cycles
+        DC_RED_acumulator = Filt_REDdata[REDsample_cnt]+DC_RED_acumulator;
 
         //NOTCH FILTER
-        DC_blockFIR_filter_writeInput( (&DC_blockFIR_filter), Filt_data[IRsample_cnt]);
+        DC_blockFIR_filter_writeInput( (&DC_blockFIR_filter), Filt_IRdata[IRsample_cnt]);
         DCnotch_Data[IRsample_cnt] = DC_blockFIR_filter_readOutput( (&DC_blockFIR_filter) );
 
-        RMSacumulator= (DCnotch_Data[IRsample_cnt] * DCnotch_Data[IRsample_cnt]) + RMSacumulator;
+        DC_blockFIR_filter_writeInput( (&DC_block_RED_FIR_filter), Filt_REDdata[REDsample_cnt]);
+        DC_RED_notch_Data[REDsample_cnt] = DC_blockFIR_filter_readOutput( (&DC_block_RED_FIR_filter) );
 
+        RMSacumulator= (DCnotch_Data[IRsample_cnt] * DCnotch_Data[IRsample_cnt]) + RMSacumulator; // 28 clock cycles (just because the use of MAC (vmla.f32))
+        RMS_RED_acumulator= (DC_RED_notch_Data[REDsample_cnt] * DC_RED_notch_Data[REDsample_cnt]) + RMS_RED_acumulator; //
         //Check if DCnotch_Data >0 -- looking for peaks
 
 
@@ -225,13 +240,18 @@ if(num_available_samples >= 1){
             j=0;
             // calculate the sqrt using PFU sqrt.f32 instruction
             IRrms= (__sqrtf(RMSacumulator/200)); // intrinsic to bypass the overhead of calling sqrtf
+            REDrms= (__sqrtf(RMS_RED_acumulator/200));
             // estimate DC component
             IR_DC = (DCacumulator/200);  // divide by N =200;
+            RED_DC = (DC_RED_acumulator/200);
             // get heart rate
             Get_HRate(&Nofpeacks, HR);
 
-            DCnotch_filter_reset((&DCnotch_filter));
-            Butterword_filter_reset((&Butterword));
+            DC_blockFIR_filter_reset((&DC_blockFIR_filter));
+            DC_blockFIR_filter_reset((&DC_block_RED_FIR_filter));
+
+            FIR_LP_filter_reset((&FIR_LP_filter));
+            FIR_LP_filter_reset((&FIR_RED_LP_filter));
             DCacumulator=0;
             RMSacumulator=0;
             IRsample_cnt=0;
@@ -354,7 +374,8 @@ void Get_HRate(uint8_t *nofpeaks,float Hr[]){
         if (Peaks_index[i]!=0){      // just to make sure that we don´t iterate beyond the number of peaks
             SampMax[i-1] = Peaks_index[i]-Peaks_index[i-1];
             Hr[i-1]=60/(((float)SampMax[i-1])/50);  // The use of floats make the process faster. Declaring Hr
-    }                                               // as float make the process faster to.
+        }                                               // as float make the process faster to.
+    }
 }
 
 

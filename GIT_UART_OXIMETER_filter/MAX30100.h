@@ -84,6 +84,8 @@ struct samplingoptions { // struct type to represent config commands receive in 
 extern uint16_t sample_cnt;
 extern float IR_FIFO_DATA[];
 extern float RED_FIFO_DATA[];
+extern float Filt_IRdata[];
+extern float Filt_REDdata[];
 extern uint16_t NofSamples;
 
 
