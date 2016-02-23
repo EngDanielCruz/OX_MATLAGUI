@@ -14,6 +14,7 @@ MAX30100.obj: ../I2C.h
 MAX30100.obj: ../Filters.h
 MAX30100.obj: ../UART.h
 MAX30100.obj: ../FIFO.h
+MAX30100.obj: ../Oled.h
 MAX30100.obj: ../Butterword_filter.h
 MAX30100.obj: ../filtfilter.h
 MAX30100.obj: C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/include/stddef.h
@@ -41,6 +42,7 @@ C:/Users/Dany/Documents/ti/cmsisproj/inc/system_LM4F.h:
 ../Filters.h: 
 ../UART.h: 
 ../FIFO.h: 
+../Oled.h: 
 ../Butterword_filter.h: 
 ../filtfilter.h: 
 C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/include/stddef.h: 

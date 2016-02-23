@@ -15,10 +15,10 @@
  *PC5->CE   -> GPIO_init (Periferal.c)
  *
  *SPI -> PORTD PA0,1,3
- *PD0->SCK	|
+ *PD0->SCK	|-D0
  *PD1->CS	|-	SPI1--Oled.c
  *---->MISO	|-
- *PD3->MOSI	|
+ *PD3->MOSI	|-D1
  *PC6->RES  -> GPIO_init (Periferal.c)
  *PC7->DC   -> GPIO_init (Periferal.c)
  */
@@ -32,13 +32,14 @@
 #include <stdlib.h>
 #include "Periferal_Init.h"
 #include "NRF24.h"
+#include "Oled.h"
 #include "SPI.h"
 #include "I2C.h"
 #include "MAX30100.h"
 #include "Filters.h"
 #include "UART.h"
 #include "MA_filter.h"
-#include "Butterword_filter.h"
+//#include "Butterword_filter.h"
 #include "DCnotch_filter.h"
 #include "DC2notch_filter.h"
 #include "DC_blockFIR_filter.h"
@@ -63,7 +64,6 @@
 //                          Prototypes functions
 //*****************************************************************************
 void CheckInterrupts(void);
-void Oled_int2string(uint8_t x, uint8_t y, uint16_t intnumber);
 void Check_MAX_Interrupts(void);
 
 //*****************************************************************************
@@ -92,8 +92,8 @@ FIR_LP_filterType FIR_LP_filter;
 extern FIR_LP_filterType FIR_RED_LP_filter;
 FIR_LP_filterType FIR_RED_LP_filter;
 
-extern Butterword_filterType Butterword;
-Butterword_filterType Butterword;
+//extern Butterword_filterType Butterword;
+//Butterword_filterType Butterword;
 
 extern DCnotch_filterType DCnotch_filter;
 DCnotch_filterType DCnotch_filter;
@@ -155,6 +155,9 @@ int main(void){
     //Oled_Init();
     I2C_Init();
     UART_Init();
+
+
+
 //-----------------------------------------------------
     //PWM_Init(16000, 8000);
     //ADC_initTimer3(40000000);
@@ -180,13 +183,16 @@ int main(void){
       MA_filter_init( &fir );                           // Initialize the filter
       FIR_LP_filter_init(&FIR_LP_filter);
       FIR_LP_filter_init(&FIR_RED_LP_filter);
-      Butterword_filter_init(&Butterword);
+     // Butterword_filter_init(&Butterword);
       DCnotch_filter_init(&DCnotch_filter);
       DC2notch_filter_init(&DC2notch_filter);
       DC_blockFIR_filter_init( &DC_blockFIR_filter);
       DC_blockFIR_filter_init( &DC_block_RED_FIR_filter);
 
+      //Oled_DisplayWhen_Init();
+
       Fifo_Init();
+
 
 //***************************************************************
 //                       WHILE LOOP

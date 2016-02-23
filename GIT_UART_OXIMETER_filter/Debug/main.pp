@@ -16,13 +16,13 @@ main.obj: C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/include/stdarg.h
 main.obj: C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/include/stdlib.h
 main.obj: ../Periferal_Init.h
 main.obj: ../NRF24.h
+main.obj: ../Oled.h
 main.obj: ../SPI.h
 main.obj: ../I2C.h
 main.obj: ../MAX30100.h
 main.obj: ../Filters.h
 main.obj: ../UART.h
 main.obj: ../MA_filter.h
-main.obj: ../Butterword_filter.h
 main.obj: ../DCnotch_filter.h
 main.obj: ../DC2notch_filter.h
 main.obj: ../DC_blockFIR_filter.h
@@ -45,13 +45,13 @@ C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/include/stdarg.h:
 C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/include/stdlib.h: 
 ../Periferal_Init.h: 
 ../NRF24.h: 
+../Oled.h: 
 ../SPI.h: 
 ../I2C.h: 
 ../MAX30100.h: 
 ../Filters.h: 
 ../UART.h: 
 ../MA_filter.h: 
-../Butterword_filter.h: 
 ../DCnotch_filter.h: 
 ../DC2notch_filter.h: 
 ../DC_blockFIR_filter.h: 

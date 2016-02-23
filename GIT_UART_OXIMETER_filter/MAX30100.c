@@ -12,6 +12,7 @@
 #include "Filters.h"
 #include "UART.h"
 #include "FIFO.h"
+#include "Oled.h"
 #include "Butterword_filter.h"
 #include "filtfilter.h"
 #include "DCnotch_filter.h"
@@ -37,11 +38,16 @@ float DCnotch_Data[200];
 float DC_RED_notch_Data[200];
 float IRrms;
 float REDrms;
+float SPO2;
+uint8_t SPO2store[20];
 uint8_t Nofpeacks;
 uint16_t Peaks_index[12];
 uint16_t preavPeakindex = 0;
 uint16_t j=0;
+uint8_t h=0;
 float HR[11];
+float HRavg;
+uint8_t HRstore[20];
 float DCacumulator;
 float DC_RED_acumulator;
 float RMSacumulator;
@@ -145,7 +151,7 @@ if(num_available_samples >= 1){
        REDsample_cnt++;
     }
 }
-*/  if (Discardsample_cnt <250){
+*/  if (Discardsample_cnt <250){  // This routine serve mainly to load up the filters structures
     // read the fifo just to keep the read and write pointers up to date
             I2C_writeByte(FIFO_DATA_REG, I2C_WRITE, (I2C_MCS_START | I2C_MCS_RUN));
             highByte = I2C_ReadByte( I2C_MCS_START|I2C_MCS_RUN | I2C_MCS_ACK);
@@ -153,8 +159,6 @@ if(num_available_samples >= 1){
             //IR_FIFO_DATA[IRsample_cnt] =  (highByte << 8) | lowByte;
             //IRsample_cnt++;
             IR_FIFO_DATA[0] =  (highByte << 8) | lowByte;
-
-
 
             highByte = I2C_ReadByte( I2C_MCS_RUN | I2C_MCS_ACK);
             lowByte = I2C_ReadByte( I2C_MCS_RUN & (~I2C_MCS_ACK) | I2C_MCS_STOP);
@@ -187,28 +191,29 @@ if(num_available_samples >= 1){
         highByte = I2C_ReadByte( I2C_MCS_RUN | I2C_MCS_ACK);
         lowByte = I2C_ReadByte( I2C_MCS_RUN & (~I2C_MCS_ACK) | I2C_MCS_STOP);
         RED_FIFO_DATA[REDsample_cnt] = ((highByte << 8) | lowByte);
-
-
+//****************************************************************************************
+//************************** LOW PASS FILTER SECTION**************************************
         FIR_LP_filter_writeInput( (&FIR_LP_filter), IR_FIFO_DATA[IRsample_cnt]  );       // Write one sample into the filter
         Filt_IRdata[IRsample_cnt] = FIR_LP_filter_readOutput( (&FIR_LP_filter) );       // Read one sample from the filter and store it in the array.
 
         FIR_LP_filter_writeInput((&FIR_RED_LP_filter), RED_FIFO_DATA[REDsample_cnt]);
         Filt_REDdata[REDsample_cnt] = FIR_LP_filter_readOutput( (&FIR_RED_LP_filter) );
-
+        // accumulator to calculate the DC value
         DCacumulator = Filt_IRdata[IRsample_cnt]+DCacumulator;    // 52 clock cycles
         DC_RED_acumulator = Filt_REDdata[REDsample_cnt]+DC_RED_acumulator;
 
-        //NOTCH FILTER
+//*************************HIGT PASS FILTER SECTION (eliminate DC component)***************
         DC_blockFIR_filter_writeInput( (&DC_blockFIR_filter), Filt_IRdata[IRsample_cnt]);
         DCnotch_Data[IRsample_cnt] = DC_blockFIR_filter_readOutput( (&DC_blockFIR_filter) );
 
         DC_blockFIR_filter_writeInput( (&DC_block_RED_FIR_filter), Filt_REDdata[REDsample_cnt]);
         DC_RED_notch_Data[REDsample_cnt] = DC_blockFIR_filter_readOutput( (&DC_block_RED_FIR_filter) );
-
+        // accumulator to calculate rms value
         RMSacumulator= (DCnotch_Data[IRsample_cnt] * DCnotch_Data[IRsample_cnt]) + RMSacumulator; // 28 clock cycles (just because the use of MAC (vmla.f32))
         RMS_RED_acumulator= (DC_RED_notch_Data[REDsample_cnt] * DC_RED_notch_Data[REDsample_cnt]) + RMS_RED_acumulator; //
-        //Check if DCnotch_Data >0 -- looking for peaks
 
+//*********************************************************************************************
+//*********************************************************************************************
 
         IRsample_cnt++;
         REDsample_cnt++;
@@ -226,10 +231,10 @@ if(num_available_samples >= 1){
 
 
 
-        if (IRsample_cnt > 200){
-            StopSampling();
+        if (IRsample_cnt > 150){
 
-            for(i=0;i<200;i++){
+
+            for(i=0;i<150;i++){
                  if (DCnotch_Data[i] > 0){
                      getPeak(DCnotch_Data, i, Peaks_index,&Nofpeacks);
                  }else{
@@ -239,76 +244,50 @@ if(num_available_samples >= 1){
             i=0;
             j=0;
             // calculate the sqrt using PFU sqrt.f32 instruction
-            IRrms= (__sqrtf(RMSacumulator/200)); // intrinsic to bypass the overhead of calling sqrtf
-            REDrms= (__sqrtf(RMS_RED_acumulator/200));
+            IRrms= (__sqrtf(RMSacumulator/150)); // intrinsic to bypass the overhead of calling sqrtf
+            REDrms= (__sqrtf(RMS_RED_acumulator/150));
             // estimate DC component
-            IR_DC = (DCacumulator/200);  // divide by N =200;
-            RED_DC = (DC_RED_acumulator/200);
+            IR_DC = (DCacumulator/150);  // divide by N =200;
+            RED_DC = (DC_RED_acumulator/150);
             // get heart rate
             Get_HRate(&Nofpeacks, HR);
+            // get SPO2
+            Get_SPO2(IRrms, REDrms, IR_DC, RED_DC, &SPO2);
 
-            DC_blockFIR_filter_reset((&DC_blockFIR_filter));
-            DC_blockFIR_filter_reset((&DC_block_RED_FIR_filter));
+            // Store the values in arrays to use in matlab
+            HRstore[h]=(uint8_t)HRavg;
+            SPO2store[h]=(uint8_t)SPO2;
 
-            FIR_LP_filter_reset((&FIR_LP_filter));
-            FIR_LP_filter_reset((&FIR_RED_LP_filter));
+            h++;
+            Nofpeacks=0;
             DCacumulator=0;
+            DC_RED_acumulator=0;
             RMSacumulator=0;
+            RMS_RED_acumulator=0;
             IRsample_cnt=0;
             REDsample_cnt=0;
-            Discardsample_cnt=0;
-            Fifocnt=0;
-
-/*
-                            // Detrend the raw data
-                            filtfilter(IR_FIFO_DATA,Filt_data);
-                            // get DC component
-                            for(i=0; i<(400); i++){
-                                DC_componente[i] = IR_FIFO_DATA[i]-Filt_data[i];
-                            }
-                            // load butterword low pass filter wiht dame samples
-                            for(i=0; i<(configValues.NofSamples-300); i++){
-                               butwrd= (float)(Filt_data[i]);
-                               Butterword_filter_writeInput( (&Butterword), butwrd );
-                            }
-                            for(i=0; i<(configValues.NofSamples); i++){
-                            butwrd= (float)(Filt_data[i]);
-                            Butterword_filter_writeInput( (&Butterword), butwrd );
-                            // pass filtered value to the FIFO
-                            butterwordfiltdata[i] = Butterword_filter_readOutput( (&Butterword) );
-                            }
-*/
-                if (samplingOptions.IRRawPlot == 1){
-
-                }
-                if(samplingOptions.REDRawPlot == 1){
-
-                }
-                if(samplingOptions.IRPlot == 1){
-
-                }
-                if(samplingOptions.RedPlot == 1){
-
-                }
 
 
-           // }
-         // send end of sampling process notification
-            printChar('A');
-            printChar('\r');
-            printChar('\n');
+            if (h>=20){
+                StopSampling();
+
+                DC_blockFIR_filter_reset((&DC_blockFIR_filter));
+                DC_blockFIR_filter_reset((&DC_block_RED_FIR_filter));
+
+                FIR_LP_filter_reset((&FIR_LP_filter));
+                FIR_LP_filter_reset((&FIR_RED_LP_filter));
+
+                Discardsample_cnt=0;
+                Fifocnt=0;
+                h=0;
+            }
+
+//**********************************DISPLAY THE RESULT*******************************
+            //Oled_int2string(16, 24, (uint16_t)HR[1]);
+
+
         }
     }
-    /* I2C_writeByte(FIFO_DATA_REG, I2C_WRITE, (I2C_MCS_START | I2C_MCS_RUN));
-    MAX_FIFO_DATA[6]   = I2C_ReadByte( I2C_MCS_START|I2C_MCS_RUN | I2C_MCS_ACK);
-    for (i=0; i< 2; i++){
-       j=i*4;
-    MAX_FIFO_DATA[j+1] = I2C_ReadByte( I2C_MCS_RUN | I2C_MCS_ACK);
-    MAX_FIFO_DATA[j+2] = I2C_ReadByte( I2C_MCS_RUN | I2C_MCS_ACK);
-    MAX_FIFO_DATA[j+3] = I2C_ReadByte( I2C_MCS_RUN | I2C_MCS_ACK);
-    MAX_FIFO_DATA[j+4] = I2C_ReadByte( I2C_MCS_RUN | I2C_MCS_STOP);
-    }*/
-
 }
 
 void StartSampling(){
@@ -369,15 +348,31 @@ void Get_HRate(uint8_t *nofpeaks,float Hr[]){
 
     uint8_t i=0;
     uint16_t SampMax[11];
+    float HRacc=0;
 // find how many´samples separate 2 consecutive max
     for (i=1; i<*nofpeaks;i++ ){
         if (Peaks_index[i]!=0){      // just to make sure that we don´t iterate beyond the number of peaks
             SampMax[i-1] = Peaks_index[i]-Peaks_index[i-1];
             Hr[i-1]=60/(((float)SampMax[i-1])/50);  // The use of floats make the process faster. Declaring Hr
-        }                                               // as float make the process faster to.
+                                                    // as float make the process faster to.
+           HRacc=Hr[i-1] + HRacc;
+        }
     }
+    HRavg=HRacc/((float)(*nofpeaks-1));
 }
 
+void Get_SPO2(float irrms, float redrms, float ir_dc,float red_dc,float *spo2){
 
+    float REDratio;
+    float IRratio;
+    float ratio;
+
+    REDratio = (redrms/red_dc);
+    IRratio = (irrms/ir_dc);
+    ratio = (REDratio/IRratio);
+    *spo2 = 110-(25*ratio);
+    // now we new to calculate SPO2 from the ratio
+
+}
 
 
