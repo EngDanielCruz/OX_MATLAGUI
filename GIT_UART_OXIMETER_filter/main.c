@@ -148,11 +148,11 @@ int main(void){
     SystemInit ();
     GPIO_init();
     SPI_Init();
-    //SPI_Oled_Init();
+    SPI_Oled_Init();
     //ConfigNRF24_Reg();
     Interrupt_IRQ();   // init IRQ pin interrupt
     Timer_Init();
-    //Oled_Init();
+    Oled_Init();
     I2C_Init();
     UART_Init();
 
@@ -189,7 +189,7 @@ int main(void){
       DC_blockFIR_filter_init( &DC_blockFIR_filter);
       DC_blockFIR_filter_init( &DC_block_RED_FIR_filter);
 
-      //Oled_DisplayWhen_Init();
+      Oled_DisplayWhen_Init();
 
       Fifo_Init();
 

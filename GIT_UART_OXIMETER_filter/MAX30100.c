@@ -267,8 +267,13 @@ if(num_available_samples >= 1){
             IRsample_cnt=0;
             REDsample_cnt=0;
 
+            // print values in the OLED display
+            // HR
+            Oled_int2string(24, 24 ,(uint8_t)HRavg);
+            // SPO2
+            Oled_int2string(40, 42 ,(uint8_t)SPO2);
 
-            if (h>=20){
+            if (h>=10){
                 StopSampling();
 
                 DC_blockFIR_filter_reset((&DC_blockFIR_filter));
