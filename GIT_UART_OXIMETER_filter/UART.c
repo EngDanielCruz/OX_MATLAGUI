@@ -46,8 +46,8 @@ void UART_Init(){
         GPIOA->DEN = (1<<0)|(1<<1);
 
         // Find  the Baud-Rate Divisor
-        // BRD = 40,000,000 / (16 * 115200) = 21.7014
-        // UARTFBRD[DIVFRAC] = integer(0.7014 * 64 + 0.5) = 45
+        // BRD = 80,000,000 / (16 * 115200) = 43.4028
+        // UARTFBRD[DIVFRAC] = integer(0.4028 * 64 + 0.5) = 26
 
 
         // With the BRD values in hand, the UART configuration is written to the module in the following order
@@ -56,9 +56,9 @@ void UART_Init(){
         UART0->CTL &= ~(1<<0);
 
         // 2. Write the integer portion of the BRD to the UARTIBRD register
-        UART0->IBRD = 21;
+        UART0->IBRD = 43;
         // 3. Write the fractional portion of the BRD to the UARTFBRD register.
-        UART0->FBRD = 45;
+        UART0->FBRD = 26;
 
         // 4. Write the desired serial parameters to the UARTLCRH register (in this case, a value of 0x0000.0060)
         UART0->LCRH = (0x3<<5);     // 8-bit, no parity, 1-stop bit
@@ -313,6 +313,7 @@ void process_command(uint8_t choose){ // choose which kind of commands should be
 void process_REGISTER_command(){
     uint8_t i=0;
     uint8_t j=0;
+    uint8_t PWcont;
     uint8_t auxcnt[4]={0,0,0};
     char auxarray[5]={0,0,0,0,0};
     for(i=0; i<16; i++){
@@ -327,6 +328,17 @@ void process_REGISTER_command(){
     configresvalue.intconfig = atoi(strncpy ( auxarray, (str+auxcnt[1]+1), auxcnt[2] ));
     configresvalue.ledconfig=atoi(strncpy ( auxarray, (str+auxcnt[2]+1), auxcnt[3] ));
 
+    // extract the value of PW (ADC resolution). This vales is used MAX30100.c for shifting the values from max fifo.
+    PWcont = (configresvalue.spo2config & (0x3));
+    if(PWcont==3){
+        configresvalue.PWcontrol=0;
+    }else if(PWcont==2){
+        configresvalue.PWcontrol=1;
+    }else if(PWcont==1){
+        configresvalue.PWcontrol=2;
+    }else{
+        configresvalue.PWcontrol=3;
+    }
 
 }
 

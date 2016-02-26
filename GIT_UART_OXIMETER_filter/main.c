@@ -162,6 +162,12 @@ int main(void){
     //PWM_Init(16000, 8000);
     //ADC_initTimer3(40000000);
     //TimerEdgeCounter_init();
+
+    //SYSCTL->RCC2|=(1<<31); // Override the RCC register fields
+    SYSCTL->RCC2|=(1<<30); // VCO frequency of 400 MHz is not divided
+    SYSCTL->RCC2&=~(1<<22); // Reset SYSDIV2LSB bit
+    SYSCTL->RCC2&=~(0x1F<<23); // Reset SYSDIV2 bits
+    SYSCTL->RCC2|=(0x04<<22); // System core clock frequency setting for 80MHz
     //SystemCoreClockUpdate();
 
     //NVIC_EnableIRQ(ADC0SS2_IRQn); //from CMSIS Library

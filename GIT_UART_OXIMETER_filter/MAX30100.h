@@ -69,7 +69,7 @@ struct configregister { // struct type to represent REGISTERconfig commands rece
     uint16_t spo2config;
     uint16_t intconfig;
     uint16_t ledconfig;
-
+    uint8_t PWcontrol;  // used only for shifting the values from max fifo
 };
 
 struct samplingoptions { // struct type to represent config commands receive in serial port

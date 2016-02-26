@@ -27,11 +27,11 @@ void I2C_Init(){
    GPIOB->PCTL |= (3<<8)|(3<<12);
    // 6. Initialize the I2C Master by writing the I2CMCR register with a value of 0x0000.0010
    I2C0->MCR = (1<<4);
-   // 7. Set the desired SCL clock speed of 100 Kbps by writing the I2CMTPR register with the correct
+   // 7. Set the desired SCL clock speed of 400 Kbps by writing the I2CMTPR register with the correct
         //value. The value written to the I2CMTPR register represents the number of system clock periods
        //in one SCL clock period. The TPR value is determined by the following equation:
        //TPR = (System Clock/(2*(SCL_LP + SCL_HP)*SCL_CLK))-1;
-   I2C0->MTPR |=(19<<0);             // for 40MHz?
+   I2C0->MTPR |=(0x9<<0);             // for 80MHz and 400Kb I2C clock speed
 }
 
 

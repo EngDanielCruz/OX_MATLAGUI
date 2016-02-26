@@ -57,7 +57,7 @@ float RED_DC;
 
 // initialize the default config values
 struct confcom configValues ={400,0.0,14,1};
-struct configregister configresvalue   ={3,14,16,204};
+struct configregister configresvalue   ={3,14,16,204,3};
 struct samplingoptions  samplingOptions ={0,0,0,0};
 
 extern Butterword_filterType Butterword;
@@ -127,44 +127,20 @@ void Read_MAX_DATAFIFO(){
    // int8_t FifoWritePTR;
    // uint8_t FifoReadPTR;
 
-//    I2C_writeByte(FIFO_WRITE_PTR, I2C_WRITE, (I2C_MCS_START | I2C_MCS_RUN));
-//    FifoWritePTR = I2C_ReadByte(((I2C_MCS_START | I2C_MCS_RUN | I2C_MCS_STOP & ~I2C_MCS_ACK)));
-
-//    I2C_writeByte(FIFO_READ_PTR, I2C_WRITE, (I2C_MCS_START | I2C_MCS_RUN));
-//    FifoReadPTR = I2C_ReadByte(((I2C_MCS_START | I2C_MCS_RUN | I2C_MCS_STOP & ~I2C_MCS_ACK)));
-
-
-//    num_available_samples = abs(16 + (FifoWritePTR+1) - FifoReadPTR) % 16;
-/*
-if(num_available_samples >= 1){
-
-    for (i=0; i< num_available_samples; i++){
-       I2C_writeByte(FIFO_DATA_REG, I2C_WRITE, (I2C_MCS_START | I2C_MCS_RUN));
-       highByte = I2C_ReadByte( I2C_MCS_START|I2C_MCS_RUN | I2C_MCS_ACK);
-       lowByte  = I2C_ReadByte( I2C_MCS_RUN | I2C_MCS_ACK);
-       IR_FIFO_DATA[IRsample_cnt] =  ((highByte << 8) | lowByte)>>1;
-       IRsample_cnt++;
-
-       highByte = I2C_ReadByte( I2C_MCS_RUN | I2C_MCS_ACK);
-       lowByte = I2C_ReadByte( I2C_MCS_RUN | I2C_MCS_ACK);
-       RED_FIFO_DATA[REDsample_cnt] = ((highByte << 8) | lowByte)>>1;
-       REDsample_cnt++;
-    }
-}
-*/  if (Discardsample_cnt <250){  // This routine serve mainly to load up the filters structures
+    if (Discardsample_cnt <250){  // This routine serve mainly to load up the filters structures
     // read the fifo just to keep the read and write pointers up to date
             I2C_writeByte(FIFO_DATA_REG, I2C_WRITE, (I2C_MCS_START | I2C_MCS_RUN));
             highByte = I2C_ReadByte( I2C_MCS_START|I2C_MCS_RUN | I2C_MCS_ACK);
             lowByte  = I2C_ReadByte( I2C_MCS_RUN | I2C_MCS_ACK);
             //IR_FIFO_DATA[IRsample_cnt] =  (highByte << 8) | lowByte;
             //IRsample_cnt++;
-            IR_FIFO_DATA[0] =  (highByte << 8) | lowByte;
+            IR_FIFO_DATA[0] =  ((highByte << 8) | lowByte)>>configresvalue.PWcontrol;
 
             highByte = I2C_ReadByte( I2C_MCS_RUN | I2C_MCS_ACK);
             lowByte = I2C_ReadByte( I2C_MCS_RUN & (~I2C_MCS_ACK) | I2C_MCS_STOP);
            //RED_FIFO_DATA[REDsample_cnt] = (highByte << 8) | lowByte;
            // REDsample_cnt++;
-            RED_FIFO_DATA[0] = (highByte << 8) | lowByte;
+            RED_FIFO_DATA[0] = ((highByte << 8) | lowByte)>>configresvalue.PWcontrol;
             // Load the filter
             FIR_LP_filter_writeInput((&FIR_LP_filter), IR_FIFO_DATA[0]);
             Filt_IRdata[0] = FIR_LP_filter_readOutput( (&FIR_LP_filter) );
@@ -174,10 +150,6 @@ if(num_available_samples >= 1){
             Filt_REDdata[0] = FIR_LP_filter_readOutput( (&FIR_RED_LP_filter) );
             DC_blockFIR_filter_writeInput( (&DC_block_RED_FIR_filter), Filt_REDdata[0]);
 
-            //FIR_filter_writeInput( (&fir11), IR_FIFO_DATA[0] );
-           // Butterword_filter_writeInput( (&Butterword), IR_FIFO_DATA[0]  );
-            //Filt_data[0] = Butterword_filter_readOutput( (&Butterword) );
-            //DCnotch_filter_writeInput((&DCnotch_filter), Filt_data[0]);
     Discardsample_cnt++;
 
     }else{
@@ -185,12 +157,12 @@ if(num_available_samples >= 1){
         I2C_writeByte(FIFO_DATA_REG, I2C_WRITE, (I2C_MCS_START | I2C_MCS_RUN));
         highByte = I2C_ReadByte( I2C_MCS_START|I2C_MCS_RUN | I2C_MCS_ACK);
         lowByte  = I2C_ReadByte( I2C_MCS_RUN | I2C_MCS_ACK);
-        IR_FIFO_DATA[IRsample_cnt] =  ((highByte << 8) | lowByte);    //16bits
+        IR_FIFO_DATA[IRsample_cnt] =  (((highByte << 8) | lowByte))>>configresvalue.PWcontrol;    //16bits
 
 
         highByte = I2C_ReadByte( I2C_MCS_RUN | I2C_MCS_ACK);
         lowByte = I2C_ReadByte( I2C_MCS_RUN & (~I2C_MCS_ACK) | I2C_MCS_STOP);
-        RED_FIFO_DATA[REDsample_cnt] = ((highByte << 8) | lowByte);
+        RED_FIFO_DATA[REDsample_cnt] = (((highByte << 8) | lowByte))>>configresvalue.PWcontrol;
 //****************************************************************************************
 //************************** LOW PASS FILTER SECTION**************************************
         FIR_LP_filter_writeInput( (&FIR_LP_filter), IR_FIFO_DATA[IRsample_cnt]  );       // Write one sample into the filter

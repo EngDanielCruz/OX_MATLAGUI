@@ -210,7 +210,7 @@
 // USESYSDIV in RCC is enabled.  The valid range of dividers is 2-64.
 //
 
-#define CFG_RCC_SYSDIV2 4
+#define CFG_RCC_SYSDIV2 2
 //      <q> PWRDN2: Power Down PLL
 //          <i> Check this box to disable the PLL.  You must also choose
 //          <i> PLL Bypass.
@@ -249,7 +249,7 @@
 
 #define DIV400  1
 
-#define SYSDIV2LSB  1
+#define SYSDIV2LSB  0
 
 //  </h>
 //

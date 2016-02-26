@@ -34,7 +34,7 @@ void SPI_Init(){
 //	4. Configure the clock prescale divisor by writing the SSICPSR register.
 	SSI0->CPSR =0x2;  // =CPSDVSR -> bus clock must be at least 2 times faster than the SSICLk...SSICLk<25MHz
 //	5. Write the SSICR0 register with the following configuration: Mode0=default state
-	SSI0->CR0 &=~(0x1<<8); // SCR = 0x0, SSIClk = SysClk / (CPSDVSR * (1 + SCR)) =>8x10e6 = 40x10e6 / (1 * (1 + 0x4))
+	SSI0->CR0 |=(0x4<<8); // SCR = 0x4, SSIClk = SysClk / (CPSDVSR * (1 + SCR)) =>8x10e6 = 80x10e6 / (2 * (1 + 0x4))
 	SSI0->CR0 |=(0x07<<0);  // 8bits data size
 //	7. Enable the SSI by setting the SSE bit in the SSICR1 register.
 	SSI0->CR1 |=(1<<1);
