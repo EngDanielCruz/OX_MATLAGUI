@@ -185,23 +185,26 @@ void Read_MAX_DATAFIFO(){
         RMS_RED_acumulator= (DC_RED_notch_Data[REDsample_cnt] * DC_RED_notch_Data[REDsample_cnt]) + RMS_RED_acumulator; //
 
 //*********************************************************************************************
+
+//*********************Send raw and filtered data... I+data;R+data*****************************
+
+           printChar('s'); // start character
+           printChar(';');
+           //Printfloat(IR_FIFO_DATA[IRsample_cnt], 5);    // send float
+           //printChar(';');
+           //Printfloat(RED_FIFO_DATA[REDsample_cnt], 5);    // send float
+           //printChar(';');
+           Printfloat(DCnotch_Data[IRsample_cnt], 3);    // send float
+           printChar(';');
+           Printfloat(DC_RED_notch_Data[REDsample_cnt], 3);    // send float
+           printChar('\r');
+           printChar('\n');
+
+
 //*********************************************************************************************
 
-        IRsample_cnt++;
-        REDsample_cnt++;
-// Send raw data... I+data;R+data
-/*
-
-           printDouble( IR_FIFO_DATA[0]);    // send float
-           printChar('\r');
-           printChar('\n');
-
-           printDouble( RED_FIFO_DATA[0]);    // send float
-           printChar('\r');
-           printChar('\n');
-*/
-
-
+           IRsample_cnt++;
+           REDsample_cnt++;
 
         if (IRsample_cnt > 150){
 
@@ -244,6 +247,16 @@ void Read_MAX_DATAFIFO(){
             Oled_int2string(24, 24 ,(uint8_t)HRavg);
             // SPO2
             Oled_int2string(40, 42 ,(uint8_t)SPO2);
+            // Send values to UART
+            printChar('S'); // start character
+            printChar(';');
+            Printfloat(HRavg,2);    // send float
+            printChar(';');
+            Printfloat(SPO2,2);    // send float
+            printChar('\r');
+            printChar('\n');
+
+
 
             if (h>=10){
                 StopSampling();

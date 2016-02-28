@@ -229,8 +229,8 @@ int main(void){
 
             case 'S':
             {
-                readStr(14);
-                process_command(1);
+                //readStr(14);
+                //process_command(1);
 
                 // initialize FIFO--- don´t forget
 
