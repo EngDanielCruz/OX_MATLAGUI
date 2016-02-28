@@ -23,7 +23,7 @@
 //*****************************************************************************
 //                          Global Variables
 //*****************************************************************************
-//uint16_t NofSamples=4000;
+//uint16_t NofSamples=400;
 float IR_FIFO_DATA[1];
 float RED_FIFO_DATA[1];
 float Filt_IRdata[MAXSAMPLES];//
