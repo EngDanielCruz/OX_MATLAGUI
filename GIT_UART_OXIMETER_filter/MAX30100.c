@@ -366,4 +366,16 @@ void Get_SPO2(float irrms, float redrms, float ir_dc,float red_dc,float *spo2){
 
 }
 
+void getPeak_fromFIFO(uint16_t indexval, uint16_t Peaks_index[]){
+    // We need at least 3 samples to compute the 2 slopes necessaries for peak detection
+    DataType *startAddr = &Fifo[0]; // get FIFO start address
 
+        if(*startAddr>0){
+            // check if the solpe1 is >0 and slop2 is <0
+            if(((*(startAddr-1)-*(startAddr-2))>0) && ((*startAddr-*(startAddr-1))<=0)){
+                //*startAddr-1 is a local peak
+                Peaks_index[j]= indexval-1 ;    // store the peak index in Peaks_index array
+                j++;
+            }
+        }
+}

@@ -108,7 +108,7 @@ void StartSampling(void);
 void getPeak(float arrvalue[], uint16_t indexval, uint16_t Peaks_index[],uint8_t *npeaks);
 void Get_HRate(uint8_t *nofpeaks,float Hr[]);
 void Get_SPO2(float irrms, float redrms, float ir_dc,float red_dc,float *spo2);
-
+void getPeak_fromFIFO(uint16_t indexval, uint16_t Peaks_index[]);
 
 
 
