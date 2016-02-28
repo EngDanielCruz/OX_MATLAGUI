@@ -314,6 +314,7 @@ void process_REGISTER_command(){
     uint8_t i=0;
     uint8_t j=0;
     uint8_t PWcont;
+    uint8_t SPO_SR;
     uint8_t auxcnt[4]={0,0,0};
     char auxarray[5]={0,0,0,0,0};
     for(i=0; i<16; i++){
@@ -339,6 +340,24 @@ void process_REGISTER_command(){
     }else{
         configresvalue.PWcontrol=3;
     }
+    // extract the value of SPO2_SR (Sample rate). This vales is used MAX30100.c to define time sample window. time Window in seconds is define in MAX30100.h by macro
+    SPO_SR = (configresvalue.spo2config & (0x1C));
+    if(SPO_SR==0x0){
+        configresvalue.SamplesWindow=(50*SAMPLES_TIME);
+    }else if(SPO_SR==0x4){
+        configresvalue.SamplesWindow=(100*SAMPLES_TIME);
+    }else if(SPO_SR==0xC){
+        configresvalue.SamplesWindow=(200*SAMPLES_TIME);
+    }else if(SPO_SR==0x10){
+        configresvalue.SamplesWindow=(400*SAMPLES_TIME);
+    }else if(SPO_SR==0x14){
+        configresvalue.SamplesWindow=(600*SAMPLES_TIME);
+    }else if(SPO_SR==0x18){
+        configresvalue.SamplesWindow=(800*SAMPLES_TIME);
+    }else{
+        configresvalue.SamplesWindow=(1000*SAMPLES_TIME);
+    }
+
 
 }
 

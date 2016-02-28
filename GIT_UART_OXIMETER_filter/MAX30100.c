@@ -20,13 +20,12 @@
 #include "DC_blockFIR_filter.h"
 #include "FIR_LP_filter.h"
 
-
 //*****************************************************************************
 //                          Global Variables
 //*****************************************************************************
 //uint16_t NofSamples=4000;
-float IR_FIFO_DATA[MAXSAMPLES];
-float RED_FIFO_DATA[MAXSAMPLES];
+float IR_FIFO_DATA[1];
+float RED_FIFO_DATA[1];
 float Filt_IRdata[MAXSAMPLES];//
 float Filt_REDdata[MAXSAMPLES];
 
@@ -56,9 +55,9 @@ float IR_DC;
 float RED_DC;
 
 // initialize the default config values
-struct confcom configValues ={400,0.0,14,1};
-struct configregister configresvalue   ={3,14,16,204,3};
-struct samplingoptions  samplingOptions ={0,0,0,0};
+struct confcom configValues ={400,0.0,14,1};                              // default values
+struct configregister configresvalue   ={3,3,16,204,3,(SAMPLES_TIME*50)}; // default values
+struct samplingoptions  samplingOptions ={0,0,0,0};                       // default values
 
 extern Butterword_filterType Butterword;
 extern FIR_LP_filterType FIR_LP_filter;
@@ -74,7 +73,7 @@ extern DC_blockFIR_filterType DC_block_RED_FIR_filter;
 
 void Max30100_Init(){
 
-    uint16_t i = 0;
+ /*   uint16_t i = 0;
 
 
     for (i=0; i<configValues.NofSamples; i++){
@@ -83,7 +82,7 @@ void Max30100_Init(){
     for (i=0; i<configValues.NofSamples; i++){
         RED_FIFO_DATA[i]=0;
     }
-
+*/
 
     I2C_writeByte(INTERRUPT_ENABLE, I2C_WRITE, (I2C_MCS_START | I2C_MCS_RUN));            //0x81
     I2C_writeByte(configresvalue.intconfig, I2C_WRITE, ( I2C_MCS_RUN | I2C_MCS_STOP));                        // enable A_FULL interrrupt
@@ -157,22 +156,22 @@ void Read_MAX_DATAFIFO(){
         I2C_writeByte(FIFO_DATA_REG, I2C_WRITE, (I2C_MCS_START | I2C_MCS_RUN));
         highByte = I2C_ReadByte( I2C_MCS_START|I2C_MCS_RUN | I2C_MCS_ACK);
         lowByte  = I2C_ReadByte( I2C_MCS_RUN | I2C_MCS_ACK);
-        IR_FIFO_DATA[IRsample_cnt] =  (((highByte << 8) | lowByte))>>configresvalue.PWcontrol;    //16bits
+        IR_FIFO_DATA[0] =  (((highByte << 8) | lowByte))>>configresvalue.PWcontrol;    //16bits
 
 
         highByte = I2C_ReadByte( I2C_MCS_RUN | I2C_MCS_ACK);
         lowByte = I2C_ReadByte( I2C_MCS_RUN & (~I2C_MCS_ACK) | I2C_MCS_STOP);
-        RED_FIFO_DATA[REDsample_cnt] = (((highByte << 8) | lowByte))>>configresvalue.PWcontrol;
+        RED_FIFO_DATA[0] = (((highByte << 8) | lowByte))>>configresvalue.PWcontrol;
 //****************************************************************************************
 //************************** LOW PASS FILTER SECTION**************************************
-        FIR_LP_filter_writeInput( (&FIR_LP_filter), IR_FIFO_DATA[IRsample_cnt]  );       // Write one sample into the filter
+        FIR_LP_filter_writeInput( (&FIR_LP_filter), IR_FIFO_DATA[0]  );       // Write one sample into the filter
         Filt_IRdata[IRsample_cnt] = FIR_LP_filter_readOutput( (&FIR_LP_filter) );       // Read one sample from the filter and store it in the array.
 
-        FIR_LP_filter_writeInput((&FIR_RED_LP_filter), RED_FIFO_DATA[REDsample_cnt]);
+        FIR_LP_filter_writeInput((&FIR_RED_LP_filter), RED_FIFO_DATA[0]);
         Filt_REDdata[REDsample_cnt] = FIR_LP_filter_readOutput( (&FIR_RED_LP_filter) );
         // accumulator to calculate the DC value
-        DCacumulator = Filt_IRdata[IRsample_cnt]+DCacumulator;    // 52 clock cycles
-        DC_RED_acumulator = Filt_REDdata[REDsample_cnt]+DC_RED_acumulator;
+        DCacumulator = Filt_IRdata[0]+DCacumulator;    // 52 clock cycles
+        DC_RED_acumulator = Filt_REDdata[0]+DC_RED_acumulator;
 
 //*************************HIGT PASS FILTER SECTION (eliminate DC component)***************
         DC_blockFIR_filter_writeInput( (&DC_blockFIR_filter), Filt_IRdata[IRsample_cnt]);
@@ -186,8 +185,8 @@ void Read_MAX_DATAFIFO(){
 
 //*********************************************************************************************
 
-//*********************Send raw and filtered data... I+data;R+data*****************************
-
+//*********************Send data... I+data;R+data*****************************
+#ifdef UART_ON
            printChar('s'); // start character
            printChar(';');
            //Printfloat(IR_FIFO_DATA[IRsample_cnt], 5);    // send float
@@ -200,13 +199,13 @@ void Read_MAX_DATAFIFO(){
            printChar('\r');
            printChar('\n');
 
-
+#endif
 //*********************************************************************************************
 
            IRsample_cnt++;
            REDsample_cnt++;
 
-        if (IRsample_cnt > 150){
+        if (IRsample_cnt > configresvalue.SamplesWindow){
 
 
             for(i=0;i<150;i++){
@@ -241,12 +240,14 @@ void Read_MAX_DATAFIFO(){
             RMS_RED_acumulator=0;
             IRsample_cnt=0;
             REDsample_cnt=0;
-
+#ifdef OLED_ON
             // print values in the OLED display
             // HR
             Oled_int2string(24, 24 ,(uint8_t)HRavg);
             // SPO2
             Oled_int2string(40, 42 ,(uint8_t)SPO2);
+#endif
+#ifdef UART_ON
             // Send values to UART
             printChar('S'); // start character
             printChar(';');
@@ -255,7 +256,7 @@ void Read_MAX_DATAFIFO(){
             Printfloat(SPO2,2);    // send float
             printChar('\r');
             printChar('\n');
-
+#endif
 
 
             if (h>=10){

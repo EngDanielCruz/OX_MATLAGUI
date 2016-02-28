@@ -13,13 +13,20 @@
 //*****************************************************************************
 //                          #defines
 //*****************************************************************************
-#define  MAXSAMPLES 300
+// comment this lines to disable this functionalities
+#define UART_ON
+//#define OLED_ON
+
+#define  MAXSAMPLES 300       // Maximum number of samples. defines the length of the raw data arrays
+#define  SAMPLES_TIME 3      // sample time in seconds*Sample rate
 #define  IR_acc 0
 #define  RED_acc 1
 
+//***********MAX30100 registers*********
+
 #define MAX30100_ADDR 0x57  // 0xAE>>1
 
-//                       ----REGISTER MAP----
+//***********Register map***************
 // STATUS
 #define INTERRUPT_STATUS 0x00
 #define INTERRUPT_ENABLE 0x01
@@ -70,6 +77,7 @@ struct configregister { // struct type to represent REGISTERconfig commands rece
     uint16_t intconfig;
     uint16_t ledconfig;
     uint8_t PWcontrol;  // used only for shifting the values from max fifo
+    uint16_t SamplesWindow;
 };
 
 struct samplingoptions { // struct type to represent config commands receive in serial port
