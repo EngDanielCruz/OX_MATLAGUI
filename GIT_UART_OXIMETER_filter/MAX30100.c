@@ -32,7 +32,7 @@ float Filt_REDdata[MAXSAMPLES];
 uint16_t IRsample_cnt=0;
 uint16_t REDsample_cnt=0;
 uint16_t Discardsample_cnt=0;
-uint8_t Fifocnt=0;
+uint16_t samplcnt=0;
 float DCnotch_Data[200];
 float DC_RED_notch_Data[200];
 float IRrms;
@@ -40,11 +40,11 @@ float REDrms;
 float SPO2;
 uint8_t SPO2store[20];
 uint8_t Nofpeacks;
-uint16_t Peaks_index[12];
+uint16_t Peaks_index[20];
 uint16_t preavPeakindex = 0;
 uint16_t j=0;
 uint8_t h=0;
-float HR[11];
+float HR[20];
 float HRavg;
 uint8_t HRstore[20];
 float DCacumulator;
@@ -66,6 +66,10 @@ extern DCnotch_filterType DCnotch_filter ;
 extern DC2notch_filterType DC2notch_filter;
 extern DC_blockFIR_filterType DC_blockFIR_filter;
 extern DC_blockFIR_filterType DC_block_RED_FIR_filter;
+extern DataType volatile *MidPt;
+extern DataType volatile *BackPt;
+extern DataType volatile *PutPt;
+extern DataType volatile Fifo[];
 
 
 //*****************************************************************************
@@ -122,7 +126,7 @@ void Read_MAX_DATAFIFO(){
     uint8_t highByte = 0;
     uint8_t lowByte = 0;
     //float fifoget_value;
-    uint16_t i;
+    //uint16_t i;
    // int8_t FifoWritePTR;
    // uint8_t FifoReadPTR;
 
@@ -144,10 +148,13 @@ void Read_MAX_DATAFIFO(){
             FIR_LP_filter_writeInput((&FIR_LP_filter), IR_FIFO_DATA[0]);
             Filt_IRdata[0] = FIR_LP_filter_readOutput( (&FIR_LP_filter) );
             DC_blockFIR_filter_writeInput( (&DC_blockFIR_filter), Filt_IRdata[0]);
+            DCnotch_Data[0] = DC_blockFIR_filter_readOutput( (&DC_blockFIR_filter));
 
             FIR_LP_filter_writeInput((&FIR_RED_LP_filter), RED_FIFO_DATA[0]);
             Filt_REDdata[0] = FIR_LP_filter_readOutput( (&FIR_RED_LP_filter) );
             DC_blockFIR_filter_writeInput( (&DC_block_RED_FIR_filter), Filt_REDdata[0]);
+            // load the fifo
+            Fifo_Write(DCnotch_Data[0]);
 
     Discardsample_cnt++;
 
@@ -165,23 +172,26 @@ void Read_MAX_DATAFIFO(){
 //****************************************************************************************
 //************************** LOW PASS FILTER SECTION**************************************
         FIR_LP_filter_writeInput( (&FIR_LP_filter), IR_FIFO_DATA[0]  );       // Write one sample into the filter
-        Filt_IRdata[IRsample_cnt] = FIR_LP_filter_readOutput( (&FIR_LP_filter) );       // Read one sample from the filter and store it in the array.
+        Filt_IRdata[0] = FIR_LP_filter_readOutput( (&FIR_LP_filter) );       // Read one sample from the filter and store it in the array.
 
         FIR_LP_filter_writeInput((&FIR_RED_LP_filter), RED_FIFO_DATA[0]);
-        Filt_REDdata[REDsample_cnt] = FIR_LP_filter_readOutput( (&FIR_RED_LP_filter) );
+        Filt_REDdata[0] = FIR_LP_filter_readOutput( (&FIR_RED_LP_filter) );
         // accumulator to calculate the DC value
-        DCacumulator = Filt_IRdata[0]+DCacumulator;    // 52 clock cycles
-        DC_RED_acumulator = Filt_REDdata[0]+DC_RED_acumulator;
+        DCacumulator = DCacumulator + Filt_IRdata[0];    // 52 clock cycles
+        DC_RED_acumulator = DC_RED_acumulator + Filt_REDdata[0];
 
 //*************************HIGT PASS FILTER SECTION (eliminate DC component)***************
-        DC_blockFIR_filter_writeInput( (&DC_blockFIR_filter), Filt_IRdata[IRsample_cnt]);
-        DCnotch_Data[IRsample_cnt] = DC_blockFIR_filter_readOutput( (&DC_blockFIR_filter) );
+        DC_blockFIR_filter_writeInput( (&DC_blockFIR_filter), Filt_IRdata[0]);
+        DCnotch_Data[0] = DC_blockFIR_filter_readOutput( (&DC_blockFIR_filter) );
 
-        DC_blockFIR_filter_writeInput( (&DC_block_RED_FIR_filter), Filt_REDdata[REDsample_cnt]);
-        DC_RED_notch_Data[REDsample_cnt] = DC_blockFIR_filter_readOutput( (&DC_block_RED_FIR_filter) );
+        DC_blockFIR_filter_writeInput( (&DC_block_RED_FIR_filter), Filt_REDdata[0]);
+        DC_RED_notch_Data[0] = DC_blockFIR_filter_readOutput( (&DC_block_RED_FIR_filter) );
         // accumulator to calculate rms value
-        RMSacumulator= (DCnotch_Data[IRsample_cnt] * DCnotch_Data[IRsample_cnt]) + RMSacumulator; // 28 clock cycles (just because the use of MAC (vmla.f32))
-        RMS_RED_acumulator= (DC_RED_notch_Data[REDsample_cnt] * DC_RED_notch_Data[REDsample_cnt]) + RMS_RED_acumulator; //
+        RMSacumulator= (DCnotch_Data[0] * DCnotch_Data[0]) + RMSacumulator; // 28 clock cycles (just because the use of MAC (vmla.f32))
+        RMS_RED_acumulator= (DC_RED_notch_Data[0] * DC_RED_notch_Data[0]) + RMS_RED_acumulator; //
+        // Write data in the fifo
+        Fifo_Write(DCnotch_Data[0]);
+
 
 //*********************************************************************************************
 
@@ -189,40 +199,44 @@ void Read_MAX_DATAFIFO(){
 #ifdef UART_ON
            printChar('s'); // start character
            printChar(';');
-           //Printfloat(IR_FIFO_DATA[IRsample_cnt], 5);    // send float
+           //Printfloat(IR_FIFO_DATA[0], 2);    // send float
            //printChar(';');
-           //Printfloat(RED_FIFO_DATA[REDsample_cnt], 5);    // send float
+           //Printfloat(RED_FIFO_DATA[0], 2);    // send float
            //printChar(';');
-           Printfloat(DCnotch_Data[IRsample_cnt], 3);    // send float
+           Printfloat(DCnotch_Data[0], 3);    // send float
            printChar(';');
-           Printfloat(DC_RED_notch_Data[REDsample_cnt], 3);    // send float
+           Printfloat(DC_RED_notch_Data[0], 3);    // send float
+           printChar(';');
            printChar('\r');
            printChar('\n');
 
 #endif
 //*********************************************************************************************
+           // check peaks
+          GetPeak_fromFIFO(samplcnt, Peaks_index,&Nofpeacks);
 
            IRsample_cnt++;
            REDsample_cnt++;
+           samplcnt++;
+        if (IRsample_cnt > configresvalue.SamplesWindow){ //
 
-        if (IRsample_cnt > configresvalue.SamplesWindow){
 
-
-            for(i=0;i<150;i++){
+           /* for(i=0;i<configresvalue.SamplesWindow;i++){
                  if (DCnotch_Data[i] > 0){
                      getPeak(DCnotch_Data, i, Peaks_index,&Nofpeacks);
                  }else{
 
                  }
-            }
-            i=0;
-            j=0;
+            }*/
+
+            //i=0;
+
             // calculate the sqrt using PFU sqrt.f32 instruction
-            IRrms= (__sqrtf(RMSacumulator/150)); // intrinsic to bypass the overhead of calling sqrtf
-            REDrms= (__sqrtf(RMS_RED_acumulator/150));
+            IRrms= (__sqrtf(RMSacumulator/configresvalue.SamplesWindow)); // intrinsic to bypass the overhead of calling sqrtf
+            REDrms= (__sqrtf(RMS_RED_acumulator/configresvalue.SamplesWindow));
             // estimate DC component
-            IR_DC = (DCacumulator/150);  // divide by N =200;
-            RED_DC = (DC_RED_acumulator/150);
+            IR_DC = (DCacumulator/configresvalue.SamplesWindow);
+            RED_DC = (DC_RED_acumulator/configresvalue.SamplesWindow);
             // get heart rate
             Get_HRate(&Nofpeacks, HR);
             // get SPO2
@@ -247,6 +261,7 @@ void Read_MAX_DATAFIFO(){
             // SPO2
             Oled_int2string(40, 42 ,(uint8_t)SPO2);
 #endif
+
 #ifdef UART_ON
             // Send values to UART
             printChar('S'); // start character
@@ -259,7 +274,7 @@ void Read_MAX_DATAFIFO(){
 #endif
 
 
-            if (h>=10){
+            if (h>=4){
                 StopSampling();
 
                 DC_blockFIR_filter_reset((&DC_blockFIR_filter));
@@ -269,8 +284,9 @@ void Read_MAX_DATAFIFO(){
                 FIR_LP_filter_reset((&FIR_RED_LP_filter));
 
                 Discardsample_cnt=0;
-                Fifocnt=0;
                 h=0;
+                samplcnt=0;
+                j=0;
             }
 
 //**********************************DISPLAY THE RESULT*******************************
@@ -366,16 +382,17 @@ void Get_SPO2(float irrms, float redrms, float ir_dc,float red_dc,float *spo2){
 
 }
 
-void getPeak_fromFIFO(uint16_t indexval, uint16_t Peaks_index[]){
+void GetPeak_fromFIFO(uint16_t indexval, uint16_t Peaks_index[],uint8_t *npeaks){
     // We need at least 3 samples to compute the 2 slopes necessaries for peak detection
-    DataType *startAddr = &Fifo[0]; // get FIFO start address
 
-        if(*startAddr>0){
+        if(*PutPt>0){
             // check if the solpe1 is >0 and slop2 is <0
-            if(((*(startAddr-1)-*(startAddr-2))>0) && ((*startAddr-*(startAddr-1))<=0)){
+            if(((*BackPt-*PutPt)>0) && ((*MidPt-*BackPt)<=0)){  // I need to use this eq because the fifowrite function increment the pointers. so i need to compensate
                 //*startAddr-1 is a local peak
                 Peaks_index[j]= indexval-1 ;    // store the peak index in Peaks_index array
                 j++;
             }
         }
+    *npeaks=j;
+
 }

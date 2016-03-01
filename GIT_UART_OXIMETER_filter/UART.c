@@ -48,17 +48,20 @@ void UART_Init(){
         // Find  the Baud-Rate Divisor
         // BRD = 80,000,000 / (16 * 115200) = 43.4028
         // UARTFBRD[DIVFRAC] = integer(0.4028 * 64 + 0.5) = 26
+        /* 1Mbit
+        BRD = 80,000,000 / (16 * 1000000) = 5.0
+        UARTFBRD[DIVFRAC] = integer(0 * 64 + 0.5) = 0  0.5 is a factor that take in account rounding errors. there is no rounding errors for this br
 
-
+         */
         // With the BRD values in hand, the UART configuration is written to the module in the following order
 
         // 1. Disable the UART by clearing the UARTEN bit in the UARTCTL register
         UART0->CTL &= ~(1<<0);
 
         // 2. Write the integer portion of the BRD to the UARTIBRD register
-        UART0->IBRD = 43;
+        UART0->IBRD = 5;
         // 3. Write the fractional portion of the BRD to the UARTFBRD register.
-        UART0->FBRD = 26;
+        UART0->FBRD = 0;
 
         // 4. Write the desired serial parameters to the UARTLCRH register (in this case, a value of 0x0000.0060)
         UART0->LCRH = (0x3<<5);     // 8-bit, no parity, 1-stop bit

@@ -18,7 +18,7 @@
 //#define OLED_ON
 
 #define  MAXSAMPLES 300       // Maximum number of samples. defines the length of the raw data arrays
-#define  SAMPLES_TIME 3      // sample time in seconds*Sample rate
+#define  SAMPLES_TIME 2      // sample time in seconds*Sample rate
 #define  IR_acc 0
 #define  RED_acc 1
 
@@ -108,7 +108,7 @@ void StartSampling(void);
 void getPeak(float arrvalue[], uint16_t indexval, uint16_t Peaks_index[],uint8_t *npeaks);
 void Get_HRate(uint8_t *nofpeaks,float Hr[]);
 void Get_SPO2(float irrms, float redrms, float ir_dc,float red_dc,float *spo2);
-void getPeak_fromFIFO(uint16_t indexval, uint16_t Peaks_index[]);
+void GetPeak_fromFIFO(uint16_t indexval, uint16_t Peaks_index[],uint8_t *npeaks);
 
 
 
