@@ -347,18 +347,25 @@ void process_REGISTER_command(){
     SPO_SR = (configresvalue.spo2config & (0x1C));
     if(SPO_SR==0x0){
         configresvalue.SamplesWindow=(50*SAMPLES_TIME);
+        configresvalue.SampRate=50;
     }else if(SPO_SR==0x4){
         configresvalue.SamplesWindow=(100*SAMPLES_TIME);
+        configresvalue.SampRate=100;
     }else if(SPO_SR==0xC){
         configresvalue.SamplesWindow=(200*SAMPLES_TIME);
+        configresvalue.SampRate=200;
     }else if(SPO_SR==0x10){
         configresvalue.SamplesWindow=(400*SAMPLES_TIME);
+        configresvalue.SampRate=400;
     }else if(SPO_SR==0x14){
         configresvalue.SamplesWindow=(600*SAMPLES_TIME);
+        configresvalue.SampRate=600;
     }else if(SPO_SR==0x18){
         configresvalue.SamplesWindow=(800*SAMPLES_TIME);
+        configresvalue.SampRate=800;
     }else{
         configresvalue.SamplesWindow=(1000*SAMPLES_TIME);
+        configresvalue.SampRate=1000;
     }
 
 

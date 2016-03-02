@@ -33,20 +33,19 @@ uint16_t IRsample_cnt=0;
 uint16_t REDsample_cnt=0;
 uint16_t Discardsample_cnt=0;
 uint16_t samplcnt=0;
-float DCnotch_Data[200];
-float DC_RED_notch_Data[200];
+float DCnotch_Data[1];
+float DC_RED_notch_Data[1];
 float IRrms;
 float REDrms;
 float SPO2;
-uint8_t SPO2store[20];
-uint8_t Nofpeacks;
-uint16_t Peaks_index[20];
-uint16_t preavPeakindex = 0;
-uint16_t j=0;
+uint8_t SPO2store[100];
+uint8_t  Nofpeacks;
+uint16_t Peaks_index[100];
+uint16_t volatile j=0;
 uint8_t h=0;
-float HR[20];
+float HR[10];
 float HRavg;
-uint8_t HRstore[20];
+uint8_t HRstore[100];
 float DCacumulator;
 float DC_RED_acumulator;
 float RMSacumulator;
@@ -56,7 +55,7 @@ float RED_DC;
 
 // initialize the default config values
 struct confcom configValues ={400,0.0,14,1};                              // default values
-struct configregister configresvalue   ={3,3,16,204,3,(SAMPLES_TIME*50)}; // default values
+struct configregister configresvalue   ={3,3,16,204,3,(SAMPLES_TIME*50),50}; // default values
 struct samplingoptions  samplingOptions ={0,0,0,0};                       // default values
 
 extern Butterword_filterType Butterword;
@@ -274,7 +273,7 @@ void Read_MAX_DATAFIFO(){
 #endif
 
 
-            if (h>=4){
+            if (h>=2){
                 StopSampling();
 
                 DC_blockFIR_filter_reset((&DC_blockFIR_filter));
@@ -351,7 +350,7 @@ void getPeak(float arrvalue[], uint16_t indexval, uint16_t Peaks_index[],uint8_t
     *npeaks=j;
 }
 
-void Get_HRate(uint8_t *nofpeaks,float Hr[]){
+void Get_HRate(uint8_t *nofpeaks,float Hr[]){  //nofpeaks per window
 
     uint8_t i=0;
     uint16_t SampMax[11];
@@ -360,9 +359,9 @@ void Get_HRate(uint8_t *nofpeaks,float Hr[]){
     for (i=1; i<*nofpeaks;i++ ){
         if (Peaks_index[i]!=0){      // just to make sure that we don´t iterate beyond the number of peaks
             SampMax[i-1] = Peaks_index[i]-Peaks_index[i-1];
-            Hr[i-1]=60/(((float)SampMax[i-1])/50);  // The use of floats make the process faster. Declaring Hr
-                                                    // as float make the process faster to.
-           HRacc=Hr[i-1] + HRacc;
+            Hr[i-1]=60/(((float)SampMax[i-1])/configresvalue.SampRate);  // I did This to keep a record of all HR. it was more efficient average de dif beetwin peak and them calculate HR
+                                                    // The use of floats make the process faster. Declaring Hr
+           HRacc=Hr[i-1] + HRacc;                   // as float make the process faster to.
         }
     }
     HRavg=HRacc/((float)(*nofpeaks-1));
@@ -391,8 +390,7 @@ void GetPeak_fromFIFO(uint16_t indexval, uint16_t Peaks_index[],uint8_t *npeaks)
                 //*startAddr-1 is a local peak
                 Peaks_index[j]= indexval-1 ;    // store the peak index in Peaks_index array
                 j++;
+                (*npeaks)++;
             }
         }
-    *npeaks=j;
-
 }

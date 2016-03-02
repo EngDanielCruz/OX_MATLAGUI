@@ -18,7 +18,7 @@
 //#define OLED_ON
 
 #define  MAXSAMPLES 300       // Maximum number of samples. defines the length of the raw data arrays
-#define  SAMPLES_TIME 2      // sample time in seconds*Sample rate
+#define  SAMPLES_TIME 3      // sample time in seconds*Sample rate
 #define  IR_acc 0
 #define  RED_acc 1
 
@@ -78,6 +78,7 @@ struct configregister { // struct type to represent REGISTERconfig commands rece
     uint16_t ledconfig;
     uint8_t PWcontrol;  // used only for shifting the values from max fifo
     uint16_t SamplesWindow;
+    uint16_t SampRate;
 };
 
 struct samplingoptions { // struct type to represent config commands receive in serial port
