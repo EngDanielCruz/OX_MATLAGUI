@@ -198,10 +198,10 @@ void Read_MAX_DATAFIFO(){
 #ifdef UART_ON
            printChar('s'); // start character
            printChar(';');
-           //Printfloat(IR_FIFO_DATA[0], 2);    // send float
-           //printChar(';');
-           //Printfloat(RED_FIFO_DATA[0], 2);    // send float
-           //printChar(';');
+           Printfloat(IR_FIFO_DATA[0], 2);    // send float
+           printChar(';');
+           Printfloat(RED_FIFO_DATA[0], 2);    // send float
+           printChar(';');
            Printfloat(DCnotch_Data[0], 3);    // send float
            printChar(';');
            Printfloat(DC_RED_notch_Data[0], 3);    // send float
@@ -273,7 +273,7 @@ void Read_MAX_DATAFIFO(){
 #endif
 
 
-            if (h>=2){
+            if (h>=6){
                 StopSampling();
 
                 DC_blockFIR_filter_reset((&DC_blockFIR_filter));
