@@ -74,6 +74,7 @@ volatile int T0flags = FALSE;
 volatile int IRQflags_NRF = FALSE;
 volatile int IRQflags_MAX = FALSE;
 volatile int ADCflag=FALSE;
+ uint8_t volatile TempReadyFlag;
 float voltage=0;
 volatile uint32_t ADCvalue;
 unsigned long val = 0;
@@ -207,11 +208,11 @@ int main(void){
 
 
     while (1){
-        uint16_t i;
+        //uint16_t i;
         //uint8_t initPos=0;
         //uint16_t finalPos=0;
         char SerialCommand;
-
+/*
         if (bit_is_clear(GPIOF->DATA,0x4)){   // Unlock hand-shake
             printChar('A');
             printChar('\r');
@@ -222,7 +223,7 @@ int main(void){
                 printChar('\n');
             }
 
-        }
+        }*/
 // Polling Uart receive start sampling command
         if((UART0->FR & (1<<4)) == 0){
             SerialCommand =readChar();
@@ -241,98 +242,6 @@ int main(void){
                    StartSampling();
             break;
             }
-            case 'R':  // send raw data
-            {
-            // send IR_FIFO_DATA to UART
-                for(i=0; i<(configValues.NofSamples-1); i++){
-                    print_uint( IR_FIFO_DATA[i], 5);
-                    printChar('\r');
-                    printChar('\n');
-                }
-            // send IR_FIFO_DATA to UART
-                for(i=0; i<(configValues.NofSamples-1); i++){
-                    print_uint( RED_FIFO_DATA[i], 5);
-                    printChar('\r');
-                    printChar('\n');
-                }
-            break;
-            }
-            case 'F':
-            {
-            // filter RED data
-                if (configValues.filt_type==1){ // MA filter
-                    /*
-                    initPos=((configValues.taps-1)>>1)+1;       // start at 6 position for n of taps=11
-                    finalPos=(configValues.NofSamples-((configValues.taps-1)>>1));
-                    ACC=0;
-                    NewValue=0;
-                    Accumulator_Init_values(RED_acc);
-                    for(i=initPos; i<finalPos; i++){
-                        Filt_data[i]= EMA_Process(RED_FIFO_DATA[i]);
-                    }
-                    for( i = 0; i < configValues.NofSamples; ++ i ){             // Loop for the length of the array
-                        MA_filter_writeInput( (&fir), RED_FIFO_DATA[i] );              // Write one sample into the filter
-                        Filt_data[i] = MA_filter_readOutput( (&fir) );        // Read one sample from the filter and store it in the array.
-
-                    }*/
-
-                }else if(configValues.filt_type==2){  // FIR filter
-
-
-                }else { // IIR filter
-
-                }
-                // send RED Filt_data to UART
-                    for(i=0; i<(configValues.NofSamples-1); i++){
-                        printDouble( Filt_IRdata[i]);    // send float
-                        printChar('\r');
-                        printChar('\n');
-                    }
-            break;
-            }
-            case 'f':    //the filter routine take 29946 clock cycles=0.007487s
-            {
-            // filter IR data
-                if (configValues.filt_type==1){
-                    /*
-                    initPos=((configValues.taps-1)>>1)+1;       // start at 6 position for n of taps=11
-                    finalPos=(configValues.NofSamples-((configValues.taps-1)>>1));
-                    ACC=0;
-                    NewValue=0;
-                    Accumulator_Init_values(IR_acc);
-                    for(i=initPos; i<finalPos; i++){
-                        Filt_data[i]= EMA_Process(IR_FIFO_DATA[i]);
-                    }
-                    for( i = 0; i < configValues.NofSamples; ++ i ){             // Loop for the length of the array
-                        MA_filter_writeInput( (&fir), IR_FIFO_DATA[i] );              // Write one sample into the filter
-                      Filt_data[i] = MA_filter_readOutput( (&fir) );        // Read one sample from the filter and store it in the array.
-                    }
-
-                }else if(configValues.filt_type==2){  // FIR filter
-
-                    for( i = 0; i < configValues.NofSamples; ++ i ){             // Loop for the length of the array
-                        FIR_filter_writeInput( (&fir11), IR_FIFO_DATA[i] );              // Write one sample into the filter
-                       Filt_data[i] = FIR_filter_readOutput( (&fir11) );        // Read one sample from the filter and store it in the array.
-                    }
-
-                }else { // IIR filter
-
-                    for( i = 0; i < configValues.NofSamples; ++ i ){             // Loop for the length of the array
-                        Butterword_filter_writeInput( (&Butterword), IR_FIFO_DATA[i] );              // Write one sample into the filter
-                       Filt_data[i] = Butterword_filter_readOutput( (&Butterword) );        // Read one sample from the filter and store it in the array.
-                   }
-
-                }
-           // send IR Filt_data to UART
-                for(i=0; i<(configValues.NofSamples-1); i++){
-                    printDouble( Filt_data[i]);    // send float
-                    printChar('\r');
-                    printChar('\n');
-                */}
-
-            break;
-            }
-
             case 'C':  // config sampling and filter routine
             {
                 readStr(14);
@@ -348,92 +257,6 @@ int main(void){
 
             break;
             }
-            case 'D':  // linear regression
-            {/*
-                double a=0;
-                double b=0;
-                double r=0;
-                //uint16_t numItems=0;
-               // uint16_t  numzeros=0;
-                //numItems = configValues.NofSamples-((configValues.taps-1)>>1);
-                //numzeros = configValues.NofSamples-(configValues.taps-1);     //n=numzeros
-
-                //Shiftarray(Filt_data, (configValues.taps-1)>>1, numItems);
-
-                Linear_Regression1(Filt_data,configValues.NofSamples-1,&a,&b,&r);  // ATENTION 11 taps
-                Detrend(Filt_data,configValues.NofSamples,&a,&b);
-                // send IR_FIFO_DATA to UART
-                for(i=0; i<(configValues.NofSamples-1); i++){
-                  Printfloat(Filt_data[i], 5);
-                  printChar('\r');
-                  printChar('\n');
-                }
-            break;
-            }
-            case 'Z':
-            {
-                uint16_t i=0;
-                uint8_t threshold=4;
-                uint16_t  numelements=0;   // total elements in the data array elements
-                uint16_t  numofzeros=0;   // nº of windows (when the "function" cross zero)
-                uint16_t Yzero[40];
-                uint16_t Xpeaks[40];
- //               uint8_t deltaSaplesMax[6];
-                for(i=0;i<40;i++) {
-                    Yzero[i]=0;
-                    Xpeaks[i]=0;
-                }
-                numelements = configValues.NofSamples-2;
-
-                Find_zero_cross(Filt_data,numelements, Yzero,&numofzeros);
-
-                // send the the indication of how many characters we will send
-                print_int(numofzeros);  // in matlab array start in 1
-                printChar('\r');
-                printChar('\n');
-                // send ZERO cross
-                for(i=0; i<numofzeros; i++){
-                  print_int( Yzero[i]);
-                  printChar('\r');
-                  printChar('\n');
-                }
-
-                // FIND PEAKS
-                // loop over all windows
-                for (i=0; i<numofzeros;i++ ){ // < deal with the last zero
-                    uint16_t winSise;
-                    uint16_t midindex;
-                    winSise =(Yzero[i+1]- Yzero[i]);
-                    midindex = ( uint16_t)(Yzero[i] + Yzero[i+1])>>1;  // (downval+upval)/2
-                    // I am interested first in positive windows only
-                    // so check it
-                    if (Filt_data[midindex]>0){
-                        Xpeaks[i]=Find_peak_Recursively(Filt_data, midindex, winSise, threshold);
-                    }else {
-                        Xpeaks[i] = Find_valleys_Recursively(Filt_data, midindex, winSise, threshold);
-                     }
-                }
-                // send the the indication of how many characters we will send
-                //print_int(numofzeros);  // in matlab array start in 1
-                //printChar('\r');
-                //printChar('\n');
-                // send ZERO cross
-                for(i=0; i<numofzeros; i++){
-                   print_int( Xpeaks[i]);
-                   printChar('\r');
-                   printChar('\n');
-                }
- //               Get_HeartRate(Filt_data, Xpeaks, numofzeros, deltaSaplesMax);
-
-                for(i=0; i<6; i++){
-                   print_int( deltaSaplesMax[i]);
-                   printChar('\r');
-                   printChar('\n');
-                }
-*/
-            break;
-            }
-
 
             default:
             {
@@ -556,7 +379,7 @@ void Check_MAX_Interrupts(){
               }else if(((MAX_StatusReg) &    (1<<(5)))){          // HR_RDY
 
                    }else if(((MAX_StatusReg) &    (1<<(6)))){     //TEMP_RDY
-
+                           TempReadyFlag=1;
                         }else if(((MAX_StatusReg) &    (1<<(7)))){    // A_FULL->15 samples on data fifo
                             Read_MAX_DATAFIFO();                  //Read DATA FIFO
                              }

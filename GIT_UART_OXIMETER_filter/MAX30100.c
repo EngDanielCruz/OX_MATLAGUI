@@ -28,6 +28,7 @@ float IR_FIFO_DATA[1];
 float RED_FIFO_DATA[1];
 float Filt_IRdata[MAXSAMPLES];//
 float Filt_REDdata[MAXSAMPLES];
+float volatile MAXtempval;
 
 uint16_t IRsample_cnt=0;
 uint16_t REDsample_cnt=0;
@@ -69,6 +70,7 @@ extern DataType volatile *MidPt;
 extern DataType volatile *BackPt;
 extern DataType volatile *PutPt;
 extern DataType volatile Fifo[];
+extern  uint8_t volatile TempReadyFlag;
 
 
 //*****************************************************************************
@@ -168,6 +170,7 @@ void Read_MAX_DATAFIFO(){
         highByte = I2C_ReadByte( I2C_MCS_RUN | I2C_MCS_ACK);
         lowByte = I2C_ReadByte( I2C_MCS_RUN & (~I2C_MCS_ACK) | I2C_MCS_STOP);
         RED_FIFO_DATA[0] = (((highByte << 8) | lowByte))>>configresvalue.PWcontrol;
+
 //****************************************************************************************
 //************************** LOW PASS FILTER SECTION**************************************
         FIR_LP_filter_writeInput( (&FIR_LP_filter), IR_FIFO_DATA[0]  );       // Write one sample into the filter
@@ -179,6 +182,20 @@ void Read_MAX_DATAFIFO(){
         DCacumulator = DCacumulator + Filt_IRdata[0];    // 52 clock cycles
         DC_RED_acumulator = DC_RED_acumulator + Filt_REDdata[0];
 
+#ifdef HIGH_SPEED
+
+        DC_blockFIR_filter_writeInput( (&DC_blockFIR_filter), Filt_IRdata[0]);
+        DCnotch_Data[0] = DC_blockFIR_filter_readOutput( (&DC_blockFIR_filter) );
+
+        DC_blockFIR_filter_writeInput( (&DC_block_RED_FIR_filter), Filt_REDdata[0]);
+        DC_RED_notch_Data[0] = DC_blockFIR_filter_readOutput( (&DC_block_RED_FIR_filter) );
+        // accumulator to calculate rms value
+        RMSacumulator= (DCnotch_Data[0] * DCnotch_Data[0]) + RMSacumulator; // 28 clock cycles (just because the use of MAC (vmla.f32))
+        RMS_RED_acumulator= (DC_RED_notch_Data[0] * DC_RED_notch_Data[0]) + RMS_RED_acumulator; //
+        // Write data in the fifo
+        Fifo_Write(DCnotch_Data[0]);
+
+#else
 //*************************HIGT PASS FILTER SECTION (eliminate DC component)***************
         DC_blockFIR_filter_writeInput( (&DC_blockFIR_filter), Filt_IRdata[0]);
         DCnotch_Data[0] = DC_blockFIR_filter_readOutput( (&DC_blockFIR_filter) );
@@ -190,6 +207,8 @@ void Read_MAX_DATAFIFO(){
         RMS_RED_acumulator= (DC_RED_notch_Data[0] * DC_RED_notch_Data[0]) + RMS_RED_acumulator; //
         // Write data in the fifo
         Fifo_Write(DCnotch_Data[0]);
+#endif
+
 
 
 //*********************************************************************************************
@@ -217,7 +236,7 @@ void Read_MAX_DATAFIFO(){
            IRsample_cnt++;
            REDsample_cnt++;
            samplcnt++;
-        if (IRsample_cnt > configresvalue.SamplesWindow){ //
+        if (IRsample_cnt >configresvalue.SamplesWindow){
 
 
            /* for(i=0;i<configresvalue.SamplesWindow;i++){
@@ -245,6 +264,16 @@ void Read_MAX_DATAFIFO(){
             HRstore[h]=(uint8_t)HRavg;
             SPO2store[h]=(uint8_t)SPO2;
 
+            // read the internal temperature sensor value
+            if (TempReadyFlag==1){
+            Read_MAX_Temp(&MAXtempval);
+            TempReadyFlag=0;
+            // Initiate a new temperature conversion = StartSampling()
+            //I2C_writeByte(MODE_CONFIG, I2C_WRITE, (I2C_MCS_START | I2C_MCS_RUN));
+            //I2C_writeByte(configresvalue.modeconfig, I2C_WRITE, (I2C_MCS_RUN | I2C_MCS_STOP ));
+            }
+
+            // reset counters and accumulators
             h++;
             Nofpeacks=0;
             DCacumulator=0;
@@ -327,6 +356,20 @@ void StartSampling(){
 void StopSampling(){
     I2C_writeByte(MODE_CONFIG, I2C_WRITE, (I2C_MCS_START | I2C_MCS_RUN));
     I2C_writeByte(0x00, I2C_WRITE, (I2C_MCS_RUN | I2C_MCS_STOP ));                         // enable mode 011 -> SPO2 enable.
+}
+
+void Read_MAX_Temp(float volatile *tempvalue){
+    uint8_t tempInt;
+    uint8_t tempFrac;
+
+    I2C_writeByte(TEMP_INTEGER, I2C_WRITE, (I2C_MCS_START | I2C_MCS_RUN));
+    tempInt = I2C_ReadByte(((I2C_MCS_START | I2C_MCS_RUN | I2C_MCS_STOP )));
+
+    I2C_writeByte(TEMP_FRACTION, I2C_WRITE, (I2C_MCS_START | I2C_MCS_RUN));
+    tempFrac = I2C_ReadByte(((I2C_MCS_START | I2C_MCS_RUN | I2C_MCS_STOP )));
+
+    *tempvalue = tempInt + (tempFrac*0.0625);
+
 }
 
 

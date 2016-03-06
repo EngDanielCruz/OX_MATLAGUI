@@ -15,6 +15,7 @@
 //*****************************************************************************
 // comment this lines to disable this functionalities
 #define UART_ON
+#define HIGH_SPEED
 //#define OLED_ON
 
 #define  MAXSAMPLES 300       // Maximum number of samples. defines the length of the raw data arrays
@@ -104,6 +105,7 @@ extern uint16_t NofSamples;
 
 void Max30100_Init(void);
 void Read_MAX_DATAFIFO(void);
+void Read_MAX_Temp(float volatile *tempvalue);
 void StopSampling(void);
 void StartSampling(void);
 void getPeak(float arrvalue[], uint16_t indexval, uint16_t Peaks_index[],uint8_t *npeaks);
