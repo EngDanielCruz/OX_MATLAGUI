@@ -34,6 +34,7 @@ uint16_t IRsample_cnt=0;
 uint16_t REDsample_cnt=0;
 uint16_t Discardsample_cnt=0;
 uint16_t samplcnt=0;
+uint8_t Hspeedcount=0;
 float DCnotch_Data[1];
 float DC_RED_notch_Data[1];
 float IRrms;
@@ -42,8 +43,14 @@ float SPO2;
 uint8_t SPO2store[100];
 uint8_t  Nofpeacks;
 uint16_t Peaks_index[100];
+uint16_t Valley_index[100];
 uint16_t volatile j=0;
+uint16_t volatile l=0;
 uint8_t h=0;
+uint8_t volatile k=0;
+uint16_t ZerocrossIndex[100];
+float LastPeakVal;
+float LastValleyVal;
 float HR[10];
 float HRavg;
 uint8_t HRstore[100];
@@ -131,7 +138,7 @@ void Read_MAX_DATAFIFO(){
    // int8_t FifoWritePTR;
    // uint8_t FifoReadPTR;
 
-    if (Discardsample_cnt <250){  // This routine serve mainly to load up the filters structures
+    if (Discardsample_cnt <configresvalue.SampRate*5){  // This routine serve mainly to load up the filters structures
     // read the fifo just to keep the read and write pointers up to date
             I2C_writeByte(FIFO_DATA_REG, I2C_WRITE, (I2C_MCS_START | I2C_MCS_RUN));
             highByte = I2C_ReadByte( I2C_MCS_START|I2C_MCS_RUN | I2C_MCS_ACK);
@@ -182,8 +189,11 @@ void Read_MAX_DATAFIFO(){
         DCacumulator = DCacumulator + Filt_IRdata[0];    // 52 clock cycles
         DC_RED_acumulator = DC_RED_acumulator + Filt_REDdata[0];
 
+        //Hspeedcount++;
+
 #ifdef HIGH_SPEED
 
+        if (Hspeedcount==50){
         DC_blockFIR_filter_writeInput( (&DC_blockFIR_filter), Filt_IRdata[0]);
         DCnotch_Data[0] = DC_blockFIR_filter_readOutput( (&DC_blockFIR_filter) );
 
@@ -194,6 +204,83 @@ void Read_MAX_DATAFIFO(){
         RMS_RED_acumulator= (DC_RED_notch_Data[0] * DC_RED_notch_Data[0]) + RMS_RED_acumulator; //
         // Write data in the fifo
         Fifo_Write(DCnotch_Data[0]);
+
+        Hspeedcount=0;
+
+        //*********************************************************************************************
+
+        //*********************Send data... I+data;R+data*****************************
+        #ifdef UART_ON
+                   printChar('s'); // start character
+                   printChar(';');
+                  // Printfloat(IR_FIFO_DATA[0], 2);    // send float
+                  // printChar(';');
+                   //Printfloat(RED_FIFO_DATA[0], 2);    // send float
+                   //printChar(';');
+                   Printfloat(DCnotch_Data[0], 3);    // send float
+                   printChar(';');
+                   Printfloat(DC_RED_notch_Data[0], 3);    // send float
+                   printChar(';');
+                   printChar('\r');
+                   printChar('\n');
+
+        #endif
+        //*********************************************************************************************
+                   // check peaks
+                  GetPeak_fromFIFO(samplcnt, Peaks_index,&Nofpeacks);
+
+
+                if (IRsample_cnt >configresvalue.SamplesWindow){
+
+                    // calculate the sqrt using PFU sqrt.f32 instruction
+                    IRrms= (__sqrtf(RMSacumulator/configresvalue.SamplesWindow)); // intrinsic to bypass the overhead of calling sqrtf
+                    REDrms= (__sqrtf(RMS_RED_acumulator/configresvalue.SamplesWindow));
+                    // estimate DC component
+                    IR_DC = (DCacumulator/configresvalue.SamplesWindow);
+                    RED_DC = (DC_RED_acumulator/configresvalue.SamplesWindow);
+                    // get heart rate
+                    Get_HRate(&Nofpeacks, HR);
+                    // get SPO2
+                    Get_SPO2(IRrms, REDrms, IR_DC, RED_DC, &SPO2);
+
+                    // Store the values in arrays to use in matlab
+                    HRstore[h]=(uint8_t)HRavg;
+                    SPO2store[h]=(uint8_t)SPO2;
+
+                    // reset counters and accumulators
+                    h++;
+                    Nofpeacks=0;
+                    DCacumulator=0;
+                    DC_RED_acumulator=0;
+                    RMSacumulator=0;
+                    RMS_RED_acumulator=0;
+                    IRsample_cnt=0;
+                    REDsample_cnt=0;
+
+                    if (h>=4){
+                        StopSampling();
+
+                        DC_blockFIR_filter_reset((&DC_blockFIR_filter));
+                        DC_blockFIR_filter_reset((&DC_block_RED_FIR_filter));
+
+                        FIR_LP_filter_reset((&FIR_LP_filter));
+                        FIR_LP_filter_reset((&FIR_RED_LP_filter));
+
+                        Discardsample_cnt=0;
+                        h=0;
+                        samplcnt=0;
+                        j=0;
+                    }
+
+              }
+
+    }
+
+        IRsample_cnt++;
+        REDsample_cnt++;
+        samplcnt++;
+
+
 
 #else
 //*************************HIGT PASS FILTER SECTION (eliminate DC component)***************
@@ -207,121 +294,116 @@ void Read_MAX_DATAFIFO(){
         RMS_RED_acumulator= (DC_RED_notch_Data[0] * DC_RED_notch_Data[0]) + RMS_RED_acumulator; //
         // Write data in the fifo
         Fifo_Write(DCnotch_Data[0]);
+
+
+
+        //*********************************************************************************************
+
+        //*********************Send data... I+data;R+data*****************************
+        #ifdef UART_ON
+                   printChar('s'); // start character
+                   printChar(';');
+                   Printfloat(IR_FIFO_DATA[0], 2);    // send float
+                   printChar(';');
+                   Printfloat(RED_FIFO_DATA[0], 2);    // send float
+                   printChar(';');
+                   Printfloat(DCnotch_Data[0], 3);    // send float
+                   printChar(';');
+                   Printfloat(DC_RED_notch_Data[0], 3);    // send float
+                   printChar(';');
+                   printChar('\r');
+                   printChar('\n');
+
+        #endif
+        //*********************************************************************************************
+                   // check peaks
+                  GetPeak_fromFIFO(samplcnt, Peaks_index,&Nofpeacks);
+
+                   IRsample_cnt++;
+                   REDsample_cnt++;
+                   samplcnt++;
+                if (IRsample_cnt >configresvalue.SamplesWindow){
+
+                    // calculate the sqrt using PFU sqrt.f32 instruction
+                    IRrms= (__sqrtf(RMSacumulator/configresvalue.SamplesWindow)); // intrinsic to bypass the overhead of calling sqrtf
+                    REDrms= (__sqrtf(RMS_RED_acumulator/configresvalue.SamplesWindow));
+                    // estimate DC component
+                    IR_DC = (DCacumulator/configresvalue.SamplesWindow);
+                    RED_DC = (DC_RED_acumulator/configresvalue.SamplesWindow);
+                    // get heart rate
+                    Get_HRate(&Nofpeacks, HR);
+                    // get SPO2
+                    Get_SPO2(IRrms, REDrms, IR_DC, RED_DC, &SPO2);
+
+                    // Store the values in arrays to use in matlab
+                    HRstore[h]=(uint8_t)HRavg;
+                    SPO2store[h]=(uint8_t)SPO2;
+
+                    // read the internal temperature sensor value
+                    if (TempReadyFlag==1){
+                    Read_MAX_Temp(&MAXtempval);
+                    TempReadyFlag=0;
+                    // Initiate a new temperature conversion = StartSampling()
+                    //I2C_writeByte(MODE_CONFIG, I2C_WRITE, (I2C_MCS_START | I2C_MCS_RUN));
+                    //I2C_writeByte(configresvalue.modeconfig, I2C_WRITE, (I2C_MCS_RUN | I2C_MCS_STOP ));
+                    }
+
+                    // reset counters and accumulators
+                    h++;
+                    Nofpeacks=0;
+                    DCacumulator=0;
+                    DC_RED_acumulator=0;
+                    RMSacumulator=0;
+                    RMS_RED_acumulator=0;
+                    IRsample_cnt=0;
+                    REDsample_cnt=0;
+        #ifdef OLED_ON
+                    // print values in the OLED display
+                    // HR
+                    Oled_int2string(24, 24 ,(uint8_t)HRavg);
+                    // SPO2
+                    Oled_int2string(40, 42 ,(uint8_t)SPO2);
+        #endif
+
+        #ifdef UART_ON
+                    // Send values to UART
+                    printChar('S'); // start character
+                    printChar(';');
+                    Printfloat(HRavg,2);    // send float
+                    printChar(';');
+                    Printfloat(SPO2,2);    // send float
+                    printChar('\r');
+                    printChar('\n');
+        #endif
+
+
+                    if (h>=6){
+                        StopSampling();
+
+                        DC_blockFIR_filter_reset((&DC_blockFIR_filter));
+                        DC_blockFIR_filter_reset((&DC_block_RED_FIR_filter));
+
+                        FIR_LP_filter_reset((&FIR_LP_filter));
+                        FIR_LP_filter_reset((&FIR_RED_LP_filter));
+
+                        Discardsample_cnt=0;
+                        h=0;
+                        samplcnt=0;
+                        j=0;
+                        k=0;
+                        LastPeakVal=0;
+                    }
+
+         }
 #endif
 
 
-
-//*********************************************************************************************
-
-//*********************Send data... I+data;R+data*****************************
-#ifdef UART_ON
-           printChar('s'); // start character
-           printChar(';');
-           Printfloat(IR_FIFO_DATA[0], 2);    // send float
-           printChar(';');
-           Printfloat(RED_FIFO_DATA[0], 2);    // send float
-           printChar(';');
-           Printfloat(DCnotch_Data[0], 3);    // send float
-           printChar(';');
-           Printfloat(DC_RED_notch_Data[0], 3);    // send float
-           printChar(';');
-           printChar('\r');
-           printChar('\n');
-
-#endif
-//*********************************************************************************************
-           // check peaks
-          GetPeak_fromFIFO(samplcnt, Peaks_index,&Nofpeacks);
-
-           IRsample_cnt++;
-           REDsample_cnt++;
-           samplcnt++;
-        if (IRsample_cnt >configresvalue.SamplesWindow){
-
-
-           /* for(i=0;i<configresvalue.SamplesWindow;i++){
-                 if (DCnotch_Data[i] > 0){
-                     getPeak(DCnotch_Data, i, Peaks_index,&Nofpeacks);
-                 }else{
-
-                 }
-            }*/
-
-            //i=0;
-
-            // calculate the sqrt using PFU sqrt.f32 instruction
-            IRrms= (__sqrtf(RMSacumulator/configresvalue.SamplesWindow)); // intrinsic to bypass the overhead of calling sqrtf
-            REDrms= (__sqrtf(RMS_RED_acumulator/configresvalue.SamplesWindow));
-            // estimate DC component
-            IR_DC = (DCacumulator/configresvalue.SamplesWindow);
-            RED_DC = (DC_RED_acumulator/configresvalue.SamplesWindow);
-            // get heart rate
-            Get_HRate(&Nofpeacks, HR);
-            // get SPO2
-            Get_SPO2(IRrms, REDrms, IR_DC, RED_DC, &SPO2);
-
-            // Store the values in arrays to use in matlab
-            HRstore[h]=(uint8_t)HRavg;
-            SPO2store[h]=(uint8_t)SPO2;
-
-            // read the internal temperature sensor value
-            if (TempReadyFlag==1){
-            Read_MAX_Temp(&MAXtempval);
-            TempReadyFlag=0;
-            // Initiate a new temperature conversion = StartSampling()
-            //I2C_writeByte(MODE_CONFIG, I2C_WRITE, (I2C_MCS_START | I2C_MCS_RUN));
-            //I2C_writeByte(configresvalue.modeconfig, I2C_WRITE, (I2C_MCS_RUN | I2C_MCS_STOP ));
-            }
-
-            // reset counters and accumulators
-            h++;
-            Nofpeacks=0;
-            DCacumulator=0;
-            DC_RED_acumulator=0;
-            RMSacumulator=0;
-            RMS_RED_acumulator=0;
-            IRsample_cnt=0;
-            REDsample_cnt=0;
-#ifdef OLED_ON
-            // print values in the OLED display
-            // HR
-            Oled_int2string(24, 24 ,(uint8_t)HRavg);
-            // SPO2
-            Oled_int2string(40, 42 ,(uint8_t)SPO2);
-#endif
-
-#ifdef UART_ON
-            // Send values to UART
-            printChar('S'); // start character
-            printChar(';');
-            Printfloat(HRavg,2);    // send float
-            printChar(';');
-            Printfloat(SPO2,2);    // send float
-            printChar('\r');
-            printChar('\n');
-#endif
-
-
-            if (h>=6){
-                StopSampling();
-
-                DC_blockFIR_filter_reset((&DC_blockFIR_filter));
-                DC_blockFIR_filter_reset((&DC_block_RED_FIR_filter));
-
-                FIR_LP_filter_reset((&FIR_LP_filter));
-                FIR_LP_filter_reset((&FIR_RED_LP_filter));
-
-                Discardsample_cnt=0;
-                h=0;
-                samplcnt=0;
-                j=0;
-            }
 
 //**********************************DISPLAY THE RESULT*******************************
             //Oled_int2string(16, 24, (uint16_t)HR[1]);
 
 
-        }
+
     }
 }
 
@@ -426,14 +508,76 @@ void Get_SPO2(float irrms, float redrms, float ir_dc,float red_dc,float *spo2){
 
 void GetPeak_fromFIFO(uint16_t indexval, uint16_t Peaks_index[],uint8_t *npeaks){
     // We need at least 3 samples to compute the 2 slopes necessaries for peak detection
-
-        if(*PutPt>0){
-            // check if the solpe1 is >0 and slop2 is <0
-            if(((*BackPt-*PutPt)>0) && ((*MidPt-*BackPt)<=0)){  // I need to use this eq because the fifowrite function increment the pointers. so i need to compensate
-                //*startAddr-1 is a local peak
-                Peaks_index[j]= indexval-1 ;    // store the peak index in Peaks_index array
-                j++;
-                (*npeaks)++;
+    // so we are one sample delayed
+    //GPIOF->DATA |= (1<<3);  //Green
+    if(*PutPt>0){
+            // check zero cross
+            if(*BackPt<0){
+                ZerocrossIndex[k]=indexval-1;
+                k++;
             }
+            // check if (present sample -1) is a peak. => solpe1 is >0 and slop2 is <0
+            if(((*BackPt-*PutPt)>0) && ((*MidPt-*BackPt)<=0)){  // I need to use this eq because the fifowrite function increment the pointers. so i need to compensate
+                if (*BackPt > THRHOLD){
+                    if(j==0){
+                       Peaks_index[j]= indexval-1 ;    // store the peak index-1 in Peaks_index array
+                       LastPeakVal= *BackPt;          // store the value correspondent to the peak index.
+                       (*npeaks)++;
+                       j++;
+                   }else{
+                    // check if the actual peak is a local or window peak
+                    if(Peaks_index[j-1] > ZerocrossIndex[k-1]){  // we already have other peak in this window?
+                          //YES. check witch peak is the window peak (bigger one)
+                          if(LastPeakVal < *BackPt){ // Present peak is
+                            Peaks_index[j-1]= indexval-1 ;    // store the peak index-1 in Peaks_index array
+                            LastPeakVal= *BackPt;          // store the value correspondent to the peak index.
+                            (*npeaks)++;
+                          }
+                    }else { // NO. so save this peak
+                       Peaks_index[j]= indexval-1 ;    // store the peak index-1 in Peaks_index array
+                       LastPeakVal= *BackPt;          // store the value correspondent to the peak index.
+                       (*npeaks)++;
+                       j++;
+                    }
+                }
+            }
+          }
+        }else { // Check for valleys
+            // check zero cross
+            if(*BackPt>0){
+              ZerocrossIndex[k]=indexval-1;
+              k++;
+            }
+
+            if(((*BackPt-*PutPt)<0) && ((*MidPt-*BackPt)>=0)){  // I need to use this eq because the fifowrite function increment the pointers. so i need to compensate
+               if (*BackPt < THRHOLD_N){   // apply a threshold
+                    if(l==0){
+                       Valley_index[l]= indexval-1 ;    // store the peak index-1 in Peaks_index array
+                       LastValleyVal= *BackPt;          // store the value correspondent to the peak index.
+                       //(*npeaks)++;
+                       l++;
+                   }else{
+                    // check if the actual peak is a local or window peak
+                    if(Valley_index[l-1] > ZerocrossIndex[k-1]){  // we already have other peak in this window?
+                          //YES. check witch peak is the window peak (bigger one)
+                          if(LastValleyVal > *BackPt){ // Present peak is
+                            Valley_index[l-1]= indexval-1 ;    // store the peak index-1 in Peaks_index array
+                            LastValleyVal= *BackPt;          // store the value correspondent to the peak index.
+                            //(*npeaks)++;
+                          }
+                    }else{ // NO. so save this peak
+                        Valley_index[l]= indexval-1 ;    // store the peak index-1 in Peaks_index array
+                        LastValleyVal= *BackPt;          // store the value correspondent to the peak index.
+                       //(*npeaks)++;
+                       l++;
+                    }
+                   }
+               }
+            }
+
         }
-}
+    //GPIOF->DATA &= ~(1<<3);  //Green
+}// function end
+
+
+

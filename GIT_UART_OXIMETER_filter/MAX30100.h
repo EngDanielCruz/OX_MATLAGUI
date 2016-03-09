@@ -15,8 +15,11 @@
 //*****************************************************************************
 // comment this lines to disable this functionalities
 #define UART_ON
-#define HIGH_SPEED
+//#define HIGH_SPEED
 //#define OLED_ON
+
+#define THRHOLD 3.0
+#define THRHOLD_N -3.0
 
 #define  MAXSAMPLES 300       // Maximum number of samples. defines the length of the raw data arrays
 #define  SAMPLES_TIME 3      // sample time in seconds*Sample rate
