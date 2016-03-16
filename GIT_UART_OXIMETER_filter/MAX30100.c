@@ -85,17 +85,6 @@ extern  uint8_t volatile TempReadyFlag;
 
 void Max30100_Init(){
 
- /*   uint16_t i = 0;
-
-
-    for (i=0; i<configValues.NofSamples; i++){
-        IR_FIFO_DATA[i]=0;
-    }
-    for (i=0; i<configValues.NofSamples; i++){
-        RED_FIFO_DATA[i]=0;
-    }
-*/
-
     I2C_writeByte(INTERRUPT_ENABLE, I2C_WRITE, (I2C_MCS_START | I2C_MCS_RUN));            //0x81
     I2C_writeByte(configresvalue.intconfig, I2C_WRITE, ( I2C_MCS_RUN | I2C_MCS_STOP));                        // enable A_FULL interrrupt
 
@@ -138,7 +127,7 @@ void Read_MAX_DATAFIFO(){
    // int8_t FifoWritePTR;
    // uint8_t FifoReadPTR;
 
-    if (Discardsample_cnt <configresvalue.SampRate*5){  // This routine serve mainly to load up the filters structures
+    if (Discardsample_cnt <configresvalue.SamplesWindow){  // This routine serve mainly to load up the filters structures
     // read the fifo just to keep the read and write pointers up to date
             I2C_writeByte(FIFO_DATA_REG, I2C_WRITE, (I2C_MCS_START | I2C_MCS_RUN));
             highByte = I2C_ReadByte( I2C_MCS_START|I2C_MCS_RUN | I2C_MCS_ACK);
@@ -189,11 +178,11 @@ void Read_MAX_DATAFIFO(){
         DCacumulator = DCacumulator + Filt_IRdata[0];    // 52 clock cycles
         DC_RED_acumulator = DC_RED_acumulator + Filt_REDdata[0];
 
-        //Hspeedcount++;
+        Hspeedcount++;
 
 #ifdef HIGH_SPEED
 
-        if (Hspeedcount==50){
+        if (Hspeedcount==SP_HighSpeed_Divisor){
         DC_blockFIR_filter_writeInput( (&DC_blockFIR_filter), Filt_IRdata[0]);
         DCnotch_Data[0] = DC_blockFIR_filter_readOutput( (&DC_blockFIR_filter) );
 
@@ -230,7 +219,7 @@ void Read_MAX_DATAFIFO(){
                   GetPeak_fromFIFO(samplcnt, Peaks_index,&Nofpeacks);
 
 
-                if (IRsample_cnt >configresvalue.SamplesWindow){
+                if (IRsample_cnt >configresvalue.SamplesWindow){//
 
                     // calculate the sqrt using PFU sqrt.f32 instruction
                     IRrms= (__sqrtf(RMSacumulator/configresvalue.SamplesWindow)); // intrinsic to bypass the overhead of calling sqrtf
@@ -257,7 +246,7 @@ void Read_MAX_DATAFIFO(){
                     IRsample_cnt=0;
                     REDsample_cnt=0;
 
-                    if (h>=4){
+                    if (h>=5){
                         StopSampling();
 
                         DC_blockFIR_filter_reset((&DC_blockFIR_filter));
@@ -274,11 +263,12 @@ void Read_MAX_DATAFIFO(){
 
               }
 
+         samplcnt++;  // keep track of new down sample count
     }
 
         IRsample_cnt++;
         REDsample_cnt++;
-        samplcnt++;
+
 
 
 
@@ -377,7 +367,7 @@ void Read_MAX_DATAFIFO(){
         #endif
 
 
-                    if (h>=6){
+                    if (h>=12){
                         StopSampling();
 
                         DC_blockFIR_filter_reset((&DC_blockFIR_filter));

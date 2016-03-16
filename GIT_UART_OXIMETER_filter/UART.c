@@ -21,6 +21,7 @@ char str[16];
 extern struct confcom configValues;
 extern struct configregister configresvalue ;
 extern struct samplingoptions  samplingOptions;
+extern uint8_t  SP_HighSpeed_Divisor;
 //*************************************************************************
 //                          FUNCTIONS
 //*************************************************************************
@@ -348,27 +349,63 @@ void process_REGISTER_command(){
     if(SPO_SR==0x0){
         configresvalue.SamplesWindow=(50*SAMPLES_TIME);
         configresvalue.SampRate=50;
+        SP_HighSpeed_Divisor=1; // sample freq. will be 50 hz. HS system should nor run in this mode
     }else if(SPO_SR==0x4){
+        #ifdef HIGH_SPEED
+        configresvalue.SamplesWindow=(100*SAMPLES_TIME);
+        configresvalue.SampRate=20;
+        SP_HighSpeed_Divisor=100/20; // sample freq. will be 20 hz
+        #else
         configresvalue.SamplesWindow=(100*SAMPLES_TIME);
         configresvalue.SampRate=100;
+        #endif
     }else if(SPO_SR==0xC){
+        #ifdef HIGH_SPEED
+        configresvalue.SampRate=20;
+        SP_HighSpeed_Divisor=200/20; // sample freq. will be 20 hz
+         configresvalue.SamplesWindow=(200*SAMPLES_TIME);
+        #else
         configresvalue.SamplesWindow=(200*SAMPLES_TIME);
         configresvalue.SampRate=200;
+        #endif
     }else if(SPO_SR==0x10){
+        #ifdef HIGH_SPEED
+        configresvalue.SampRate=20;
+        configresvalue.SamplesWindow=(400*SAMPLES_TIME);
+        SP_HighSpeed_Divisor=400/20; // sample freq. will be 20 hz
+        #else
         configresvalue.SamplesWindow=(400*SAMPLES_TIME);
         configresvalue.SampRate=400;
+        #endif
+
     }else if(SPO_SR==0x14){
+        #ifdef HIGH_SPEED
+        configresvalue.SampRate=20;
+        configresvalue.SamplesWindow=(600*SAMPLES_TIME);
+        SP_HighSpeed_Divisor=600/20; // sample freq. will be 20 hz
+        #else
         configresvalue.SamplesWindow=(600*SAMPLES_TIME);
         configresvalue.SampRate=600;
+        #endif
     }else if(SPO_SR==0x18){
+        #ifdef HIGH_SPEED
+        configresvalue.SampRate=20;
+        configresvalue.SamplesWindow=(800*SAMPLES_TIME);
+        SP_HighSpeed_Divisor=800/20; // sample freq. will be 20 hz
+        #else
         configresvalue.SamplesWindow=(800*SAMPLES_TIME);
         configresvalue.SampRate=800;
+        #endif
     }else{
+        #ifdef HIGH_SPEED
+        configresvalue.SampRate=20;
+        configresvalue.SamplesWindow=(1000*SAMPLES_TIME);
+        SP_HighSpeed_Divisor=1000/20; // sample freq. will be 20 hz
+        #else
         configresvalue.SamplesWindow=(1000*SAMPLES_TIME);
         configresvalue.SampRate=1000;
+        #endif
     }
-
-
 }
 
 

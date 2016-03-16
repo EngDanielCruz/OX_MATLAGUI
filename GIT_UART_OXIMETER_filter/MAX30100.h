@@ -15,7 +15,7 @@
 //*****************************************************************************
 // comment this lines to disable this functionalities
 #define UART_ON
-//#define HIGH_SPEED
+#define HIGH_SPEED
 //#define OLED_ON
 
 #define THRHOLD 4.0
@@ -100,6 +100,7 @@ extern float RED_FIFO_DATA[];
 extern float Filt_IRdata[];
 extern float Filt_REDdata[];
 extern uint16_t NofSamples;
+uint8_t  SP_HighSpeed_Divisor;  // variable to hold down sample divisor in high speed mode
 
 
 //*************************************************************************
