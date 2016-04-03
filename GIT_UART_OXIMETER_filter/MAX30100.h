@@ -15,7 +15,7 @@
 //*****************************************************************************
 // comment this lines to disable this functionalities
 #define UART_ON
-#define HIGH_SPEED
+//#define HIGH_SPEED
 //#define OLED_ON
 
 #define THRHOLD 4.0

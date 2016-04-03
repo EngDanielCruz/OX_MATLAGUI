@@ -367,7 +367,7 @@ void Read_MAX_DATAFIFO(){
         #endif
 
 
-                    if (h>=12){
+                    if (h>=2){
                         StopSampling();
 
                         DC_blockFIR_filter_reset((&DC_blockFIR_filter));
